@@ -3498,7 +3498,7 @@ function saveImport(form){
 }
 
 /* ---------- sincronización na nube (Firebase) ---------- */
-var FBCFG_BAKED=null;
+var FBCFG_BAKED={"apiKey": "AIzaSyB0MBoP8EdU1N5hf8s8cBKtwi9NvhvzURU", "authDomain": "xesti-bf288.firebaseapp.com", "projectId": "xesti-bf288", "storageBucket": "xesti-bf288.firebasestorage.app", "messagingSenderId": "1008657809198", "appId": "1:1008657809198:web:b4d0c32102c6928b0684bf"};
 var SY=load('vd.sync.v1',{});
 function saveSY(){try{localStorage.setItem('vd.sync.v1',JSON.stringify(SY))}catch(e){}}
 var sync={on:false,user:null,ready:{},known:{},pend:{},unsub:[],status:'off',err:'',offline:false};
