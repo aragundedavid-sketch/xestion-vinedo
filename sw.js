@@ -1,5 +1,5 @@
 // Service worker: deixa a app abrirse sen cobertura e garda os mosaicos do mapa que vas vendo.
-const SHELL = 'vd-shell-v9', TILES = 'vd-tiles-v3', FONTS = 'vd-fonts-v1';
+const SHELL = 'vd-shell-v10', TILES = 'vd-tiles-v3', FONTS = 'vd-fonts-v1';
 const FILES = ['./', './index.html', './manifest.webmanifest', './icon-192.png', './icon-512.png'];
 const MAX_TILES = 900;
 

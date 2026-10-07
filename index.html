@@ -845,24 +845,26 @@ textarea{min-height:76px;resize:vertical}
 .cal-head{display:flex;align-items:center;gap:8px}
 .cal-head h3{flex:1;text-align:center;font-size:18px;text-transform:capitalize}
 .cal-head button{background:var(--card);border:1px solid var(--line);border-radius:8px;padding:7px 12px;font-weight:600;font-size:14px}
-.cal-grid{display:grid;grid-template-columns:repeat(7,minmax(0,1fr));gap:3px}
+.cal-grid{display:flex;flex-direction:column;gap:3px}
+.cal-dows{display:grid;grid-template-columns:repeat(7,minmax(0,1fr));gap:0 3px}
 .cal-dow{font-size:11px;text-transform:uppercase;letter-spacing:.06em;color:var(--muted);text-align:center;padding:4px 0}
-.cal-cell{min-height:56px;min-width:0;background:var(--card);border:1px solid var(--line);border-radius:8px;padding:3px 3px 4px;display:flex;flex-direction:column;gap:3px;text-align:left;align-items:stretch}
+.cal-week{display:grid;grid-template-columns:repeat(7,minmax(0,1fr));column-gap:3px;min-height:58px}
+.cal-cell{grid-row:1 / -1;min-width:0;background:var(--card);border:1px solid var(--line);border-radius:8px;padding:3px;display:flex;align-items:flex-start;justify-content:space-between;text-align:left}
 .cal-cell.out{opacity:.45}
 .cal-cell.sel{outline:2px solid var(--accent);outline-offset:-1px}
 .cal-cell .n{font-size:12.5px;font-weight:600;width:22px;height:22px;display:grid;place-items:center;font-variant-numeric:tabular-nums;border-radius:99px}
 .cal-cell.today .n{background:var(--accent);color:var(--accent-fg)}
-.cal-cell .dots{display:flex;flex-wrap:wrap;gap:3px;padding-left:3px}
-.cal-cell .dots i{width:7px;height:7px;border-radius:50%}
-.cal-cell .dots i.plan,.cal-legend i.plan{background:var(--accent)}
-.cal-cell .dots i.late,.cal-legend i.late{background:var(--late)}
-.cal-cell .dots i.done,.cal-legend i.done{background:var(--ok)}
-.cal-cell .lab{display:none;font-size:11px;line-height:1.2;padding:2px 5px;border-radius:5px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-weight:600}
-.cal-cell .lab.plan{background:var(--accent-soft);color:var(--accent)}
-.cal-cell .lab.late{background:var(--late-soft);color:var(--late)}
-.cal-cell .lab.done{background:var(--ok-soft);color:var(--ok)}
-.cal-cell .lab.more{background:none;color:var(--muted)}
-@media (min-width:560px){.cal-cell{min-height:86px}.cal-cell .dots{display:none}.cal-cell .lab{display:block}}
+.cal-cell .more{font-size:10.5px;color:var(--muted);font-weight:600;padding:3px 3px 0 0}
+.cal-bar{z-index:1;align-self:center;height:17px;min-width:0;margin:0 2px;border:0;border-radius:5px;padding:0 5px;font:600 10.5px/17px var(--body);text-align:left;overflow:hidden;white-space:nowrap;text-overflow:ellipsis;cursor:pointer}
+.cal-bar span{display:block;overflow:hidden;text-overflow:ellipsis}
+.cal-bar.cl{border-top-left-radius:0;border-bottom-left-radius:0;margin-left:0}
+.cal-bar.cr{border-top-right-radius:0;border-bottom-right-radius:0;margin-right:0}
+.cal-bar.plan{background:var(--accent-soft);color:var(--accent);box-shadow:inset 3px 0 0 var(--accent)}
+.cal-bar.late{background:var(--late-soft);color:var(--late);box-shadow:inset 3px 0 0 var(--late)}
+.cal-bar.done{background:var(--ok-soft);color:var(--ok);box-shadow:inset 3px 0 0 var(--ok)}
+.cal-bar.cl.plan,.cal-bar.cl.late,.cal-bar.cl.done{box-shadow:none}
+.cal-legend i.plan{background:var(--accent)} .cal-legend i.late{background:var(--late)} .cal-legend i.done{background:var(--ok)}
+@media (min-width:560px){.cal-week{min-height:86px}.cal-bar{height:19px;line-height:19px;font-size:11.5px}}
 .cal-legend{display:flex;gap:14px;flex-wrap:wrap;font-size:12.5px;color:var(--muted)}
 .cal-legend span{display:inline-flex;align-items:center;gap:6px}
 .cal-legend i{width:8px;height:8px;border-radius:50%;display:inline-block}
@@ -1026,7 +1028,7 @@ input[type=search]{width:100%;background:var(--card);border:1px solid var(--line
         <button type="button" data-act="gnat" data-n="gasto" aria-pressed="false">Gastos</button>
         <button type="button" data-act="gnat" data-n="inversion" aria-pressed="false">Inversións</button>
       </div>
-      <div class="filters"><select id="gAno" aria-label="Ano"></select><select id="gCat" aria-label="Categoría"></select></div>
+      <div class="filters"><select id="gAno" aria-label="Campaña"></select><select id="gCat" aria-label="Categoría"></select></div>
       <div class="filters"><select id="gPar" aria-label="Parcela"></select></div>
       <div id="gCats"></div>
       <div id="gPars"></div>
@@ -2465,7 +2467,7 @@ var ov = load(LS.pc,{});
 var gastos = load(LS.ga,[]);
 var custom = load(LS.cu,[]);
 var notas = load(LS.no,[]);
-var ui = Object.assign({tab:'expl',esub:'parcelas',filtro:'todas',estado:'planificado',parcela:'',base:'pnoa',vista:'lista',gNat:'todo',gAno:'todos',gCat:'',gPar:'',nPar:''}, load(LS.ui,{}));
+var ui = Object.assign({tab:'expl',esub:'parcelas',filtro:'todas',estado:'planificado',parcela:'',base:'pnoa',vista:'lista',gNat:'todo',gCamp:null,gCat:'',gPar:'',nPar:''}, load(LS.ui,{}));
 var saveUi=function(){try{localStorage.setItem(LS.ui,JSON.stringify(ui))}catch(e){}};
 try{ if(navigator.storage&&navigator.storage.persist) navigator.storage.persist(); }catch(e){}
 
@@ -2523,6 +2525,10 @@ function reparto(e){
   ids.forEach(function(i){out[i]=s>0?e.importe*(BYID[i].superficie_m2||0)/s:e.importe/ids.length});
   return out;
 }
+/* campaña agrícola: a 2027 vai do 1 de outubro de 2026 ao 30 de setembro de 2027 */
+function campDe(d){ if(!d) return null; var y=+d.slice(0,4), m=+d.slice(5,7); return String(m>=10?y+1:y) }
+function campTxt(c){ return 'Campaña '+c }
+function campRango(c){ return 'out '+(c-1)+' – set '+c }
 function parteDe(e,pid){ if(!pid) return e.importe; var r=reparto(e); return r[pid==='xeral'?'__xeral':pid]||0 }
 
 /* ---------- mapa ---------- */
@@ -2873,9 +2879,9 @@ function openFicha(id){
   var ns=notasOrden(notas.filter(function(n){return (n.parcelas||[]).indexOf(id)>-1}));
   html+='<div class="sub-t"><h3>Caderno de notas <span style="font-family:var(--body);font-weight:500;color:var(--muted);font-size:13px">· '+ns.length+'</span></h3><button class="btn sm line" type="button" data-act="newnota" data-id="'+esc(id)+'">+ Nota</button></div>'+
     (ns.length?'<div class="notes mini-notes" style="margin-bottom:8px">'+ns.slice(0,4).map(notaCard).join('')+'</div>'+(ns.length>4?'<button class="btn sm line" type="button" data-act="vernotas" data-id="'+esc(id)+'">Ver as '+ns.length+' notas</button>':''):'<p class="note">Sen notas nesta parcela.</p>');
-  var yy=hoxe().slice(0,4), gy=0, gt=0;
-  entradas().forEach(function(e){ if(e.previsto) return; var p=parteDe(e,id); gt+=p; if((e.data||'').slice(0,4)===yy) gy+=p });
-  if(gt>0) html+='<h3 class="sec-t">Gastos imputados</h3><dl class="facts">'+fact('Ano '+yy,eur(gy)+' · '+eur(gy/(f.superficie_m2/10000))+'/ha')+fact('Total histórico',eur(gt))+'</dl>'+
+  var yy=campDe(hoxe()), gy=0, gt=0;
+  entradas().forEach(function(e){ if(e.previsto) return; var p=parteDe(e,id); gt+=p; if(campDe(e.data)===yy) gy+=p });
+  if(gt>0) html+='<h3 class="sec-t">Gastos imputados</h3><dl class="facts">'+fact(campTxt(yy),eur(gy)+' · '+eur(gy/(f.superficie_m2/10000))+'/ha')+fact('Total histórico',eur(gt))+'</dl>'+
     '<button class="btn sm line" type="button" data-act="vergastos" data-id="'+esc(id)+'">Ver gastos da parcela</button>';
   openSheet(html);
 }
@@ -3008,11 +3014,12 @@ function renderTrab(){
 /* ---------- traballos: calendario ---------- */
 var now0=new Date(), calY=now0.getFullYear(), calM=now0.getMonth(), calSel=hoxe();
 function renderCal(){
-  var today=hoxe(), by={};
+  var today=hoxe(), by={}, evs=[];
   traballos.forEach(function(t){
     if(ui.parcela&&t.parcelas.indexOf(ui.parcela)<0) return;
     var ini=iniDe(t); if(!ini) return;
     var fin=finDe(t), p=ini.split('-').map(Number);
+    evs.push({t:t,ini:ini,fin:fin});
     for(var k=0;k<400;k++){
       var s=iso(new Date(p[0],p[1]-1,p[2]+k));
       (by[s]=by[s]||[]).push(t);
@@ -3020,14 +3027,37 @@ function renderCal(){
     }
   });
   $('#calTitle').textContent=new Date(calY,calM,1).toLocaleDateString('gl-ES',{month:'long',year:'numeric'});
-  var off=(new Date(calY,calM,1).getDay()+6)%7, html='';
-  ['L','M','M','X','V','S','D'].forEach(function(d){html+='<div class="cal-dow" aria-hidden="true">'+d+'</div>'});
-  for(var i=0;i<42;i++){
-    var dt=new Date(calY,calM,1-off+i), s=iso(dt), ts=by[s]||[];
-    var cls='cal-cell'+(dt.getMonth()!==calM?' out':'')+(s===today?' today':'')+(s===calSel?' sel':'');
-    var dots=ts.slice(0,4).map(function(t){return '<i class="'+estadoClase(t,today)+'"></i>'}).join('');
-    var labs=ts.slice(0,2).map(function(t){return '<span class="lab '+estadoClase(t,today)+'">'+esc(t.tipo)+'</span>'}).join('')+(ts.length>2?'<span class="lab more">+'+(ts.length-2)+'</span>':'');
-    html+='<button type="button" class="'+cls+'" data-act="cal-day" data-d="'+s+'" aria-label="'+dt.getDate()+' de '+dt.toLocaleDateString('gl-ES',{month:'long'})+(ts.length?', '+ts.length+(ts.length===1?' traballo':' traballos'):'')+'"><span class="n">'+dt.getDate()+'</span><span class="dots">'+dots+'</span>'+labs+'</button>';
+  var off=(new Date(calY,calM,1).getDay()+6)%7, MAXL=3;
+  var html='<div class="cal-dows">'+['L','M','M','X','V','S','D'].map(function(d){return '<div class="cal-dow" aria-hidden="true">'+d+'</div>'}).join('')+'</div>';
+  for(var w=0;w<6;w++){
+    var days=[]; for(var d=0;d<7;d++) days.push(new Date(calY,calM,1-off+w*7+d));
+    if(w>=4&&days[0].getMonth()!==calM&&days[0]>new Date(calY,calM,1)) break;
+    var ws=iso(days[0]), we=iso(days[6]);
+    /* segmentos desta semana: un traballo de varios días é unha soa barra que cruza as casas */
+    var segs=evs.filter(function(e){return e.ini<=we&&e.fin>=ws}).map(function(e){
+      var a=e.ini<ws?ws:e.ini, b=e.fin>we?we:e.fin;
+      return {e:e,c0:diasEntre(ws,a),c1:diasEntre(ws,b),contL:e.ini<ws,contR:e.fin>we};
+    }).sort(function(x,y){return x.c0-y.c0||(y.c1-y.c0)-(x.c1-x.c0)});
+    var lanes=[], extra=[0,0,0,0,0,0,0];
+    segs.forEach(function(sg){
+      var l=0; while(l<lanes.length&&lanes[l]>=sg.c0) l++;
+      if(l>=MAXL){ for(var c=sg.c0;c<=sg.c1;c++) extra[c]++; sg.lane=-1; return; }
+      lanes[l]=sg.c1; sg.lane=l;
+    });
+    var L=Math.min(lanes.length,MAXL);
+    html+='<div class="cal-week" style="grid-template-rows:24px repeat('+L+',19px) minmax(6px,1fr)">';
+    days.forEach(function(dt,ci){
+      var s=iso(dt), ts=by[s]||[];
+      var cls='cal-cell'+(dt.getMonth()!==calM?' out':'')+(s===today?' today':'')+(s===calSel?' sel':'');
+      html+='<button type="button" class="'+cls+'" style="grid-column:'+(ci+1)+'" data-act="cal-day" data-d="'+s+'" aria-label="'+dt.getDate()+' de '+dt.toLocaleDateString('gl-ES',{month:'long'})+(ts.length?', '+ts.length+(ts.length===1?' traballo':' traballos'):'')+'"><span class="n">'+dt.getDate()+'</span>'+(extra[ci]?'<span class="more">+'+extra[ci]+'</span>':'')+'</button>';
+    });
+    segs.forEach(function(sg){
+      if(sg.lane<0) return;
+      var t=sg.e.t, cl=estadoClase(t,today);
+      var lab=esc(t.tipo)+(t.parcelas&&t.parcelas.length?' · '+esc(nomesParcelas(t.parcelas)):'');
+      html+='<button type="button" class="cal-bar '+cl+(sg.contL?' cl':'')+(sg.contR?' cr':'')+'" style="grid-column:'+(sg.c0+1)+' / '+(sg.c1+2)+';grid-row:'+(sg.lane+2)+'" data-act="edit" data-id="'+esc(t.id)+'" title="'+lab+' · '+esc(rangoDe(t))+'"><span>'+(sg.contL?'… ':'')+lab+'</span></button>';
+    });
+    html+='</div>';
   }
   $('#calGrid').innerHTML=html;
   var ds=by[calSel]||[], p=calSel.split('-').map(Number);
@@ -3158,15 +3188,18 @@ function entradas(){
 function setOptions(sel,html,val){ if(sel.getAttribute('data-sig')!==html){sel.innerHTML=html;sel.setAttribute('data-sig',html)} sel.value=val }
 function renderGastos(){
   var all=entradas(), reais=all.filter(function(e){return !e.previsto}), prev=all.filter(function(e){return e.previsto});
-  var anos=[]; reais.forEach(function(e){var y=(e.data||'').slice(0,4); if(y&&anos.indexOf(y)<0) anos.push(y)}); anos.sort().reverse();
-  if(ui.gAno!=='todos'&&anos.indexOf(ui.gAno)<0) ui.gAno='todos';
-  setOptions($('#gAno'),'<option value="todos">Todos os anos</option>'+anos.map(function(y){return '<option>'+y+'</option>'}).join(''),ui.gAno);
+  var actual=campDe(hoxe()), camps=[actual];
+  all.forEach(function(e){var c=campDe(e.data); if(c&&camps.indexOf(c)<0) camps.push(c)}); camps.sort().reverse();
+  if(ui.gCamp==null) ui.gCamp=actual;
+  if(ui.gCamp!=='todas'&&camps.indexOf(ui.gCamp)<0) ui.gCamp=actual;
+  setOptions($('#gAno'),camps.map(function(c){return '<option value="'+c+'">'+campTxt(c)+' ('+campRango(+c)+')</option>'}).join('')+'<option value="todas">Todas as campañas</option>',ui.gCamp);
   setOptions($('#gCat'),'<option value="">Todas as categorías</option>'+CATS.map(function(c){return '<option>'+esc(c)+'</option>'}).join(''),ui.gCat);
   $$('[data-act="gnat"]').forEach(function(b){b.setAttribute('aria-pressed',String(b.getAttribute('data-n')===ui.gNat))});
 
   var gp=ui.gPar||'';
   $('#gPar').value=gp;
-  var anoSet=reais.filter(function(e){return ui.gAno==='todos'||(e.data||'').slice(0,4)===ui.gAno});
+  var anoSet=reais.filter(function(e){return ui.gCamp==='todas'||campDe(e.data)===ui.gCamp});
+  prev=prev.filter(function(e){return ui.gCamp==='todas'||!e.data||campDe(e.data)===ui.gCamp});
   /* co filtro de parcela, cada apunte conta só pola parte imputada a esa parcela */
   var parSet=gp?anoSet.map(function(e){var p=parteDe(e,gp); return p?Object.assign({},e,{total:e.importe,importe:p}):null}).filter(Boolean):anoSet;
   var sg=0,si=0; parSet.forEach(function(e){if(e.natureza==='inversion') si+=e.importe; else sg+=e.importe});
@@ -3174,6 +3207,7 @@ function renderGastos(){
     '<div class="stat"><b>'+eur(sg)+'</b><span>Gastos</span></div>'+
     '<div class="stat"><b>'+eur(si)+'</b><span>Inversións</span></div>'+
     '<div class="stat"><b>'+eur(sg+si)+'</b><span>Total</span></div>'+
+    (ui.gCamp!=='todas'?'<p class="resnote">'+campTxt(ui.gCamp)+': do 1 de outubro de '+(ui.gCamp-1)+' ao 30 de setembro de '+ui.gCamp+(ui.gCamp===campDe(hoxe())?' · en curso':'')+'.</p>':'')+
     (gp?'<p class="resnote">Só a parte imputada a <b>'+esc(gp==='xeral'?'Xeral (sen parcela)':BYID[gp].nome)+'</b>'+(gp!=='xeral'?' · '+eur((sg+si)/(BYID[gp].superficie_m2/10000))+'/ha':'')+'.</p>':'');
 
   var natSet=parSet.filter(function(e){return ui.gNat==='todo'||e.natureza===ui.gNat});
@@ -3856,7 +3890,7 @@ document.addEventListener('click',function(e){
         save(LS.no,notas); closeSheet(); refreshAll(); toast('Nota borrada');
       }); break;
     case 'vernotas': closeSheet(); ui.nPar=id; $('#nBusca').value=''; saveUi(); setTab('expl'); setEsub('notas'); renderNotas(); break;
-    case 'vergastos': closeSheet(); ui.gPar=id; saveUi(); setTab('gast'); renderGastos(); break;
+    case 'vergastos': closeSheet(); ui.gPar=id; ui.gCamp=campDe(hoxe()); saveUi(); setTab('gast'); renderGastos(); break;
     case 'gpar': ui.gPar=ui.gPar===id?'':id; saveUi(); renderGastos(); break;
     case 'importgeo': $('#fileGeo').click(); break;
     case 'imp-ten':
@@ -3899,7 +3933,7 @@ document.addEventListener('change',function(e){
   f.min=e.target.value;
   if(f.value&&e.target.value&&f.value<e.target.value) f.value=e.target.value;
 });
-$('#gAno').addEventListener('change',function(e){ui.gAno=e.target.value;saveUi();renderGastos()});
+$('#gAno').addEventListener('change',function(e){ui.gCamp=e.target.value;saveUi();renderGastos()});
 $('#gCat').addEventListener('change',function(e){ui.gCat=e.target.value;saveUi();renderGastos()});
 $('#gPar').addEventListener('change',function(e){ui.gPar=e.target.value;saveUi();renderGastos()});
 $('#nParcela').addEventListener('change',function(e){ui.nPar=e.target.value;saveUi();renderNotas()});
