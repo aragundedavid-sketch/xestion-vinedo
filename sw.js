@@ -1,5 +1,5 @@
 // Service worker: deixa a app abrirse sen cobertura e garda os mosaicos do mapa que vas vendo.
-const SHELL = 'vd-shell-v13', TILES = 'vd-tiles-v3', FONTS = 'vd-fonts-v1';
+const SHELL = 'vd-shell-v14', TILES = 'vd-tiles-v4', FONTS = 'vd-fonts-v1';
 const FILES = ['./', './index.html', './manifest.webmanifest', './icon-192.png', './icon-512.png'];
 const MAX_TILES = 900;
 
@@ -44,7 +44,7 @@ self.addEventListener('fetch', e => {
     } else {
       e.respondWith(staleWhileRevalidate(req, SHELL));
     }
-  } else if (url.hostname === 'www.ign.es' || url.hostname.endsWith('.basemaps.cartocdn.com')) {
+  } else if (url.hostname === 'www.ign.es' || url.hostname === 'tile.openstreetmap.org') {
     e.respondWith(cacheFirst(req, TILES, MAX_TILES).catch(() => new Response('', { status: 504 })));
   } else if (url.hostname === 'fonts.googleapis.com' || url.hostname === 'fonts.gstatic.com') {
     e.respondWith(staleWhileRevalidate(req, FONTS));
