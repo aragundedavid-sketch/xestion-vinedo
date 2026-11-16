@@ -740,6 +740,7 @@ main{padding-bottom:calc(84px + env(safe-area-inset-bottom,0px))}
 .share i{display:block;height:100%}
 .share .o{background:var(--own)} .share .r{background:var(--rent)}
 .resnote{grid-column:1/-1;margin:0;font-size:12.5px;color:var(--muted)}
+.linkbtn{background:none;border:0;padding:0;color:var(--accent);font-weight:600;font-size:inherit;text-decoration:underline;cursor:pointer}
 @media (max-width:480px){.resumo{grid-template-columns:repeat(2,minmax(0,1fr))}.resumo.r3{grid-template-columns:repeat(3,minmax(0,1fr))}.resumo.r3 .stat b{font-size:20px}}
 
 .dot{display:inline-block;width:10px;height:10px;border-radius:3px;flex:none;background:var(--muted)}
@@ -751,6 +752,12 @@ main{padding-bottom:calc(84px + env(safe-area-inset-bottom,0px))}
 .mapbox.drawing .leaflet-grab,.mapbox.drawing .leaflet-interactive{cursor:crosshair}
 .mapbox.drawing{border-color:#FFD23F;box-shadow:0 0 0 2px #FFD23F55}
 .mapbtns{position:absolute;top:10px;right:10px;z-index:1001;display:flex;flex-direction:column;gap:6px}
+.leaflet-control.mapsum{background:var(--card);color:var(--fg);border:1px solid var(--line);border-radius:8px;padding:5px 9px;font-size:12px;line-height:1.3;box-shadow:0 1px 3px rgba(0,0,0,.25);font-variant-numeric:tabular-nums;max-width:calc(100vw - 150px);margin-bottom:24px!important}
+.mapsum[hidden]{display:none}
+.mapsum b{font-weight:700}
+.xlsbar{display:flex;gap:10px;align-items:center}
+.xlsbar .btn{display:inline-flex;gap:8px;align-items:center}
+.xlsbar small{color:var(--muted);font-size:12.5px;flex:1;min-width:0}
 .mapbtns button{background:var(--card);color:var(--fg);border:1px solid var(--line);border-radius:8px;padding:7px 11px;font-size:12.5px;font-weight:600;box-shadow:0 1px 3px rgba(0,0,0,.25)}
 .maperr{position:absolute;left:10px;top:10px;right:118px;z-index:1001;background:var(--card);border:1px solid var(--late);border-radius:10px;padding:8px 10px;font-size:12.5px;line-height:1.35;box-shadow:0 1px 4px rgba(0,0,0,.25)}
 .maperr b{color:var(--late)}
@@ -804,6 +811,34 @@ main{padding-bottom:calc(84px + env(safe-area-inset-bottom,0px))}
 .chip.plan{background:var(--accent-soft);color:var(--accent)}
 .chip.late{background:var(--late-soft);color:var(--late)}
 .chip.done{background:var(--ok-soft);color:var(--ok)}
+.chip.proc{background:#FFF1BF;color:#7A5C00}
+.chip.pend{background:var(--surface);color:var(--muted);border:1px solid var(--line)}
+@media (prefers-color-scheme:dark){.chip.proc{background:#3A3110;color:#F2D06B}}
+/* seguimento */
+#smap{height:clamp(240px,40vh,420px);width:100%;background:var(--surface)}
+.seg-head{display:flex;flex-direction:column;gap:6px;background:var(--card);border:1px solid var(--line);border-radius:12px;padding:12px}
+.seg-head h3{font-size:17px;display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+.prog{height:10px;border-radius:99px;background:var(--line);overflow:hidden;display:flex}
+.prog i{display:block;height:100%}
+.prog .f{background:#3B9D46} .prog .p{background:#F2C200}
+.seg-legend{display:flex;gap:14px;flex-wrap:wrap;font-size:12.5px;color:var(--muted)}
+.seg-legend span{display:inline-flex;gap:6px;align-items:center}
+.seg-legend i{width:10px;height:10px;border-radius:3px;display:inline-block}
+.banner{background:var(--ok-soft);color:var(--ok);border-radius:12px;padding:10px 12px;display:flex;gap:10px;align-items:center;flex-wrap:wrap;font-weight:600;font-size:14px}
+.banner span{flex:1;min-width:160px}
+.tbl{width:100%;border-collapse:collapse;font-size:13px;font-variant-numeric:tabular-nums}
+.tbl th{font-size:11px;text-transform:uppercase;letter-spacing:.05em;color:var(--muted);font-weight:600;text-align:right;padding:6px 6px;border-bottom:1px solid var(--line);white-space:nowrap}
+.tbl th:first-child,.tbl td:first-child{text-align:left}
+.tbl td{padding:8px 6px;border-bottom:1px solid var(--line);text-align:right;white-space:nowrap}
+.tbl td:first-child{white-space:normal;overflow-wrap:anywhere}
+.tbl tr.click{cursor:pointer} .tbl tr.click:hover td{background:var(--surface)}
+.tbl tr.on td{background:var(--accent-soft)}
+.tbl tr.sub td{background:var(--surface);font-size:12.5px}
+.tbl tr.tot td{font-weight:700;border-bottom:0}
+.tbl .best{color:var(--ok);font-weight:700} .tbl .worst{color:var(--late);font-weight:700}
+.tblwrap{overflow-x:auto;background:var(--card);border:1px solid var(--line);border-radius:12px;padding:4px 6px}
+.hrow{display:grid;grid-template-columns:1fr 110px;gap:10px;align-items:center;margin-bottom:6px;font-size:14px}
+.hrow input{min-height:38px}
 .chip.inv{background:color-mix(in srgb,var(--rent) 22%,transparent);color:var(--rent)}
 .chip.t-propiedade{background:color-mix(in srgb,var(--own) 18%,transparent);color:var(--own)}
 .chip.t-alugada{background:color-mix(in srgb,var(--rent) 20%,transparent);color:var(--rent)}
@@ -994,8 +1029,14 @@ input[type=search]{width:100%;background:var(--card);border:1px solid var(--line
       <div class="seg" role="group" aria-label="Vista">
         <button type="button" data-act="vista" data-v="lista" aria-pressed="true">Lista</button>
         <button type="button" data-act="vista" data-v="cal" aria-pressed="false">Calendario</button>
+        <button type="button" data-act="vista" data-v="seg" aria-pressed="false">Seguimento</button>
       </div>
-      <div class="filters"><select id="fParcela" aria-label="Filtrar por parcela"></select></div>
+      <div class="filters" id="fParcelaWrap"><select id="fParcela" aria-label="Filtrar por parcela"></select></div>
+
+      <div id="segBox" class="view" style="padding:0" hidden>
+        <div class="filters"><select id="sTrab" aria-label="Traballo a seguir"></select></div>
+        <div id="segBody" class="view" style="padding:0"></div>
+      </div>
 
       <div id="listaBox" class="view" style="padding:0">
         <div class="seg" role="group" aria-label="Estado dos traballos">
@@ -1030,6 +1071,8 @@ input[type=search]{width:100%;background:var(--card);border:1px solid var(--line
       </div>
       <div class="filters"><select id="gAno" aria-label="Campaña"></select><select id="gCat" aria-label="Categoría"></select></div>
       <div class="filters"><select id="gPar" aria-label="Parcela"></select></div>
+      <div class="xlsbar"><button type="button" class="btn line sm" data-act="xls"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 4v11m0 0-4-4m4 4 4-4M5 19h14"/></svg>Descargar Excel</button><small id="xlsNote"></small></div>
+      <div id="gComp"></div>
       <div id="gCats"></div>
       <div id="gPars"></div>
       <div class="sumline" id="gSum"></div>
@@ -1061,6 +1104,7 @@ input[type=search]{width:100%;background:var(--card);border:1px solid var(--line
 <div class="toast" id="toast" role="status" aria-live="polite" hidden></div>
 <input type="file" id="fileImport" accept="application/json,.json" hidden>
 <input type="file" id="fileGeo" accept=".geojson,.json,application/geo+json,application/json" hidden>
+<datalist id="dl-quen"></datalist>
 <datalist id="dl-uni"><option value="rolos"><option value="kg"><option value="l"><option value="ud"><option value="m"><option value="sacos"><option value="postes"><option value="h"></datalist>
 
 <noscript>Esta app necesita JavaScript.</noscript>
@@ -2572,6 +2616,9 @@ Object.keys(bases).forEach(function(k){
     { setBase(alt); toast(k==='pnoa'?'O satélite non cargou; móstroche o mapa.':'O mapa non cargou; móstroche o satélite.'); }
   });
 });
+var sumCtl=L.control({position:'bottomleft'});
+sumCtl.onAdd=function(){var d=L.DomUtil.create('div','mapsum'); d.id='mapsum'; d.setAttribute('aria-live','polite'); L.DomEvent.disableClickPropagation(d); return d};
+sumCtl.addTo(map);
 var group=L.featureGroup().addTo(map);
 var layers={};
 function styleFor(id){
@@ -2596,6 +2643,7 @@ function rebuildLayers(){
 }
 function restyle(){FEATS.forEach(function(f){if(layers[f.id]) layers[f.id].setStyle(styleFor(f.id))})}
 function applyFiltro(){
+  setTimeout(updMapSum,0);
   FEATS.forEach(function(f){
     var show=ui.filtro==='todas'||ui.filtro===f.tenencia, l=layers[f.id];
     if(!l) return;
@@ -2607,6 +2655,21 @@ function fitAll(){var b=group.getBounds(); if(b.isValid()) map.fitBounds(b,{padd
 function zoomToId(id){var l=layers[id]; if(l){ if(!group.hasLayer(l)) group.addLayer(l); map.fitBounds(l.getBounds(),{padding:[40,40],maxZoom:19}); }}
 function updLabels(){$('#mapbox').classList.toggle('nolabels',map.getZoom()<15)}
 map.on('zoomend',updLabels);
+/* superficie das parcelas que se ven agora no mapa (as que entran, aínda que sexa en parte, na vista) */
+function updMapSum(){
+  var el=$('#mapsum'); if(!el) return;
+  if(!FEATS.length||drawing||editing){ el.hidden=true; return; }
+  var vb=map.getBounds(), n=0, m2=0, tot=0, ntot=0;
+  FEATS.forEach(function(f){
+    var l=layers[f.id]; if(!l||!group.hasLayer(l)) return;
+    ntot++; tot+=f.superficie_m2;
+    if(vb.intersects(l.getBounds())){ n++; m2+=f.superficie_m2; }
+  });
+  el.hidden=false;
+  el.innerHTML=n===ntot?'<b>'+nf(m2/10000)+' ha</b> · '+n+(n===1?' recinto':' recintos')+' (todos á vista)':
+    'Na vista: <b>'+nf(m2/10000)+' ha</b> · '+n+' de '+ntot+' recintos';
+}
+map.on('moveend',updMapSum);
 var locMarker=null;
 map.on('locationfound',function(e){
   if(locMarker) map.removeLayer(locMarker);
@@ -2772,6 +2835,18 @@ function saveNova(form){
 /* ---------- resumo, filtros, lista de parcelas ---------- */
 function renderResumo(){
   var tot=0,own=0,rent=0,deb=0;
+  if(FEATS.length&&ui.filtro!=='todas'){
+    var vis=FEATS.filter(function(f){return f.tenencia===ui.filtro}), sv=0, dv=0;
+    vis.forEach(function(f){sv+=f.superficie_m2; if(!f.oficial) dv++});
+    var all=FEATS.reduce(function(a,f){return a+f.superficie_m2},0);
+    $('#resumo').innerHTML=
+      '<div class="stat"><b>'+nf(sv/10000)+'<small>ha</small></b><span><i class="dot '+ui.filtro+'"></i>'+TEN[ui.filtro]+'</span></div>'+
+      '<div class="stat"><b>'+vis.length+'</b><span>Recintos</span></div>'+
+      '<div class="stat"><b>'+nf(all?sv/all*100:0,0)+'<small>%</small></b><span>Do total</span></div>'+
+      '<div class="stat"><b>'+nf(all/10000)+'<small>ha</small></b><span>Total explotación</span></div>'+
+      '<p class="resnote">Só as parcelas de '+TEN[ui.filtro].toLowerCase()+'. <button type="button" class="linkbtn" data-act="filtro" data-f="todas">Ver todas</button>'+(dv?' · '+dv+' coa superficie do contorno (≈).':'')+'</p>';
+    return;
+  }
   if(!FEATS.length){ $('#resumo').innerHTML='<div class="stat"><b>0<small>ha</small></b><span>Total</span></div><div class="stat"><b>0</b><span>Recintos</span></div>'; return; }
   FEATS.forEach(function(f){tot+=f.superficie_m2; if(f.tenencia==='propiedade') own+=f.superficie_m2; else rent+=f.superficie_m2; if(!f.oficial) deb++});
   $('#resumo').innerHTML=
@@ -2979,12 +3054,13 @@ function jobCard(t,today){
 }
 function renderTrab(){
   $$('[data-act="vista"]').forEach(function(b){b.setAttribute('aria-pressed',String(b.getAttribute('data-v')===ui.vista))});
-  $('#listaBox').hidden=ui.vista!=='lista'; $('#calBox').hidden=ui.vista!=='cal';
+  $('#listaBox').hidden=ui.vista!=='lista'; $('#calBox').hidden=ui.vista!=='cal'; $('#segBox').hidden=ui.vista!=='seg'; $('#fParcelaWrap').hidden=ui.vista==='seg';
   var nP=traballos.filter(function(t){return t.estado==='planificado'}).length;
   var nF=traballos.filter(function(t){return t.estado==='feito'}).length;
   $('#c-plan').textContent=nP; $('#c-feito').textContent=nF; $('#c-todos').textContent=traballos.length;
   $$('[data-act="estado-lista"]').forEach(function(b){b.setAttribute('aria-pressed',String(b.getAttribute('data-e')===ui.estado))});
   if(ui.vista==='cal'){renderCal();return}
+  if(ui.vista==='seg'){renderSeg();return}
 
   var list=traballos.filter(function(t){
     if(ui.estado!=='todos'&&t.estado!==ui.estado) return false;
@@ -3085,6 +3161,7 @@ function openForm(id,preset){
   preset=preset||{};
   var d=Object.assign({tipo:TIPOS[0],estado:'planificado',parcelas:[],dataPrev:hoxe(),dataPrevFin:'',dataFeita:'',dataFeitaFin:'',horas:'',persoas:'',custoPrev:'',custoReal:'',produto:'',dose:'',notas:''}, t||{}, preset);
   if(d.estado==='feito'){
+    if((d.horas===''||d.horas==null)&&t&&horasRex(t)>0) d.horas=Math.round(horasRex(t)*100)/100;
     if(!d.dataFeita) d.dataFeita=hoxe();
     if(d.custoReal===''||d.custoReal==null) d.custoReal=d.custoPrev;
   }
@@ -3112,7 +3189,7 @@ function openForm(id,preset){
   '<div class="grid2 only-feito"><div class="field"><label for="f-feita">Desde</label><input type="date" id="f-feita" value="'+val(d.dataFeita)+'"></div>'+
     '<div class="field"><label for="f-feitafin">Ata (se durou varios días)</label><input type="date" id="f-feitafin" min="'+val(d.dataFeita)+'" value="'+val(d.dataFeitaFin)+'"></div></div>'+
   '<div class="grid2 only-feito"><div class="field"><label for="f-horas">Horas</label><input type="number" id="f-horas" inputmode="decimal" min="0" step="0.25" value="'+val(d.horas)+'"></div>'+
-    '<div class="field"><label for="f-persoas">Quen o fixo</label><input type="text" id="f-persoas" value="'+val(d.persoas)+'" placeholder="Eu, cuadrilla…"></div></div>'+
+    quenField('f',quenDe(d),d.persoas)+'</div>'+
   '<div class="sub-t"><h3>Man de obra e servizos</h3></div>'+
   '<div class="grid2"><div class="field"><label for="f-cprev">Previsto (€)</label><input type="number" id="f-cprev" inputmode="decimal" min="0" step="0.01" value="'+val(d.custoPrev)+'"></div>'+
     '<div class="field only-feito"><label for="f-creal">Real (€)</label><input type="number" id="f-creal" inputmode="decimal" min="0" step="0.01" value="'+val(d.custoReal)+'"></div></div>'+
@@ -3152,11 +3229,12 @@ function saveJob(form){
     tipo:$('#f-tipo',form).value, estado:estado, parcelas:parcelas,
     dataPrev:dataPrev||null, dataPrevFin:(dataPrev&&prevFin&&prevFin>dataPrev)?prevFin:null,
     dataFeita:estado==='feito'?dataFeita:null, dataFeitaFin:(estado==='feito'&&feitaFin&&feitaFin>dataFeita)?feitaFin:null,
-    horas:estado==='feito'?num('#f-horas'):null, persoas:estado==='feito'?$('#f-persoas',form).value.trim():'',
+    horas:estado==='feito'?num('#f-horas'):null, quen:estado==='feito'?quenVal('f',form).quen:null, persoas:estado==='feito'?quenVal('f',form).persoas:'',
     custoPrev:num('#f-cprev'), custoReal:estado==='feito'?num('#f-creal'):null,
     produto:$('#f-prod',form).value.trim(), dose:$('#f-dose',form).value.trim(), notas:$('#f-notas',form).value.trim()
   };
   var idx=traballos.map(function(t){return t.id}).indexOf(obj.id);
+  if(idx>-1) obj=Object.assign({},traballos[idx],obj);
   if(idx>-1) traballos[idx]=obj; else traballos.push(obj);
   var antes=matsDe(obj.id);
   var novos=rows.map(function(m){
@@ -3172,6 +3250,230 @@ function saveJob(form){
   return true;
 }
 
+/* ---------- quen o fixo: propio / outro ---------- */
+function quenDe(t){ if(t.quen) return t.quen; var p=(t.persoas||'').trim(); return (!p||/^(eu|yo|propio|propia)$/i.test(p))?'propio':'outro' }
+function quenTxt(t){ return quenDe(t)==='outro'?(t.persoas||'Outro'):'Propio' }
+function nomesQuen(){
+  var set={};
+  traballos.forEach(function(t){ if(quenDe(t)==='outro'&&t.persoas) set[t.persoas]=1; (t.rexistros||[]).forEach(function(r){ if(r.quen==='outro'&&r.persoas) set[r.persoas]=1 }) });
+  return Object.keys(set).sort();
+}
+function quenField(pre,q,nome){
+  $('#dl-quen').innerHTML=nomesQuen().map(function(n){return '<option value="'+esc(n)+'">'}).join('');
+  return '<div class="field quenf" data-q="'+q+'"><span class="l">Quen o fixo</span>'+
+    '<div class="seg" role="group" aria-label="Quen o fixo"><button type="button" data-act="quen-form" data-q="propio" aria-pressed="'+(q==='propio')+'">Propio</button><button type="button" data-act="quen-form" data-q="outro" aria-pressed="'+(q==='outro')+'">Outro</button></div>'+
+    '<input type="text" id="'+pre+'-persoas" list="dl-quen" placeholder="Quen? (empresa, persoa…)" value="'+esc(q==='outro'?(nome||''):'')+'"'+(q==='outro'?'':' hidden')+' style="margin-top:6px"></div>';
+}
+function quenVal(pre,form){
+  var w=$('.quenf',form), q=w?w.getAttribute('data-q'):'propio';
+  return {quen:q, persoas:q==='outro'?$('#'+pre+'-persoas',form).value.trim():''};
+}
+
+/* ---------- seguimento dos traballos por parcela ---------- */
+function rexDe(t){ return t.rexistros||[] }
+/* horas de cada parcela segundo os rexistros: se se deron por parcela úsanse; se se deu un total, repártese pola superficie */
+function horasParcRex(t){
+  var out={};
+  rexDe(t).forEach(function(r){
+    if(r.pp){ Object.keys(r.pp).forEach(function(k){ var v=Number(r.pp[k]); if(!isNaN(v)&&r.pp[k]!==null&&r.pp[k]!=='') out[k]=(out[k]||0)+v }) }
+    else if(r.horas){ var rp=reparto({importe:Number(r.horas),parcelas:r.parcelas}); Object.keys(rp).forEach(function(k){ if(k!=='__xeral') out[k]=(out[k]||0)+rp[k] }) }
+  });
+  return out;
+}
+function horasRex(t){ var h=horasParcRex(t); return Object.keys(h).reduce(function(a,k){return a+h[k]},0) }
+function horasTrab(t){ var r=horasRex(t); return r>0?r:(t.estado==='feito'&&t.horas?Number(t.horas):0) }
+/* horas por parcela para o rendemento: rexistros se os hai; se non, as horas do traballo repartidas pola superficie */
+function horasPorParcela(t){
+  var hp=horasParcRex(t);
+  if(Object.keys(hp).length) return hp;
+  if(t.estado==='feito'&&t.horas){ var rp=reparto({importe:Number(t.horas),parcelas:t.parcelas}); delete rp.__xeral; return rp }
+  return {};
+}
+function estadoParc(t,pid){
+  if((t.feitas||{})[pid]) return 'feita';
+  if(t.estado==='feito') return 'feita';
+  if(rexDe(t).some(function(r){return r.parcelas.indexOf(pid)>-1})) return 'proceso';
+  return 'pendente';
+}
+var EST_TXT={pendente:'Pendente',proceso:'En proceso',feita:'Feita'}, EST_CHIP={pendente:'pend',proceso:'proc',feita:'done'}, EST_COL={pendente:'#9AA5A8',proceso:'#F2C200',feita:'#3B9D46'};
+function nomeTrab(t){ var c=campDe(iniDe(t)); return t.tipo+(c?' · '+campTxt(c):'') }
+function custoParcelas(t){
+  /* custo do traballo repartido: polas horas se as hai por parcela, se non pola superficie */
+  var c=custoTrab(t), tot=t.estado==='feito'?c.total:0, out={};
+  if(!tot) return out;
+  var hp=horasParcRex(t), sh=Object.keys(hp).reduce(function(a,k){return a+hp[k]},0);
+  if(sh>0) Object.keys(hp).forEach(function(k){ out[k]=tot*hp[k]/sh });
+  else { var rp=reparto({importe:tot,parcelas:t.parcelas}); delete rp.__xeral; out=rp }
+  return out;
+}
+var smap=null, slayers=null, sbase=null;
+function ensureSmap(){
+  if(smap) return;
+  smap=L.map('smap',{maxZoom:20,zoomSnap:.5}); smap.setView([42.5,-8.78],12);
+  var k=ui.base==='pnoa'?'pnoa':'carto', src=bases[k]||bases.pnoa;
+  sbase=L.tileLayer(src._url,Object.assign({},src.options)).addTo(smap);
+  slayers=L.featureGroup().addTo(smap);
+}
+function renderSeg(){
+  var sel=$('#sTrab');
+  var js=traballos.filter(function(t){return t.parcelas&&t.parcelas.length&&iniDe(t)}).slice().sort(function(a,b){return (iniDe(b)||'').localeCompare(iniDe(a)||'')});
+  var grp={}; js.forEach(function(t){ var c=campDe(iniDe(t))||'—'; (grp[c]=grp[c]||[]).push(t) });
+  var opts='<option value="">Resumo por labor (rendemento)</option>'+Object.keys(grp).sort().reverse().map(function(c){
+    return '<optgroup label="'+esc(campTxt(c))+'">'+grp[c].map(function(t){
+      var n=t.parcelas.length, f=t.parcelas.filter(function(p){return estadoParc(t,p)==='feita'}).length;
+      return '<option value="'+esc(t.id)+'">'+esc(t.tipo)+' · '+esc(rangoDe(t))+' · '+f+'/'+n+(t.estado==='feito'?' ✓':'')+'</option>';
+    }).join('')+'</optgroup>';
+  }).join('');
+  if(ui.sTrab&&!jobById(ui.sTrab)) ui.sTrab='';
+  setOptions(sel,opts,ui.sTrab||'');
+  if(!ui.sTrab){ renderLabor(); return; }
+  var t=jobById(ui.sTrab), ids=t.parcelas.filter(function(p){return BYID[p]});
+  var st={}, cnt={pendente:0,proceso:0,feita:0}, ha={pendente:0,proceso:0,feita:0}, haT=0;
+  ids.forEach(function(p){ var e=estadoParc(t,p); st[p]=e; cnt[e]++; ha[e]+=BYID[p].superficie_m2; haT+=BYID[p].superficie_m2 });
+  var hp=horasPorParcela(t), cp=custoParcelas(t), hTot=horasTrab(t);
+  var chip=t.estado==='feito'?'<span class="chip done">Feito</span>':(cnt.proceso||cnt.feita?'<span class="chip proc">En curso</span>':'<span class="chip plan">Planificado</span>');
+  var html='<div class="seg-head"><h3>'+esc(nomeTrab(t))+' '+chip+'</h3>'+
+    '<div class="sumline">'+esc(rangoDe(t))+' · '+cnt.feita+'/'+ids.length+' parcelas feitas · '+haTxt(ha.feita)+' de '+haTxt(haT)+(hTot?' · '+nf(hTot,1)+' h':'')+'</div>'+
+    '<div class="prog" role="img" aria-label="Avance"><i class="f" style="width:'+(haT?ha.feita/haT*100:0)+'%"></i><i class="p" style="width:'+(haT?ha.proceso/haT*100:0)+'%"></i></div>'+
+    '<div class="actions" style="margin-top:4px"><button class="btn sm" type="button" data-act="seg-rex">+ Rexistrar traballo</button><button class="btn sm line" type="button" data-act="edit" data-id="'+esc(t.id)+'">Editar traballo</button></div></div>';
+  if(t.estado!=='feito'&&ids.length&&cnt.feita===ids.length)
+    html+='<div class="banner"><span>Todas as parcelas están feitas.</span><button class="btn sm" type="button" data-act="seg-pechar">Marcar traballo como feito</button></div>';
+  html+='<div class="mapbox"><div id="smap" role="application" aria-label="Mapa do seguimento"></div></div>'+
+    '<div class="seg-legend"><span><i style="background:'+EST_COL.pendente+'"></i>Pendente '+cnt.pendente+'</span><span><i style="background:'+EST_COL.proceso+'"></i>En proceso '+cnt.proceso+'</span><span><i style="background:'+EST_COL.feita+'"></i>Feita '+cnt.feita+'</span></div>';
+  /* táboa por parcela con rendemento */
+  var rows=ids.map(function(p){ var h=hp[p]||0, a=BYID[p].superficie_m2/10000; return {p:p,h:h,a:a,hha:h&&a?h/a:null,eha:cp[p]&&a?cp[p]/a:null} });
+  var hs=rows.filter(function(r){return r.hha!=null}).map(function(r){return r.hha}), mn=Math.min.apply(null,hs), mx=Math.max.apply(null,hs);
+  rows.sort(function(a,b){ var o={proceso:0,pendente:1,feita:2}; return o[st[a.p]]-o[st[b.p]]||BYID[a.p].nome.localeCompare(BYID[b.p].nome,'gl') });
+  html+='<h3 class="cats-t" style="margin-top:6px">Parcelas</h3><div class="tblwrap"><table class="tbl"><thead><tr><th>Parcela</th><th>Estado</th><th>ha</th><th>Horas</th><th>h/ha</th>'+(t.estado==='feito'?'<th>€/ha</th>':'')+'</tr></thead><tbody>'+
+    rows.map(function(r){
+      var cls=hs.length>1&&r.hha!=null?(r.hha===mn?' class="best"':r.hha===mx?' class="worst"':''):'';
+      return '<tr class="click" data-act="seg-par" data-id="'+esc(r.p)+'"><td>'+esc(BYID[r.p].nome)+'</td><td><span class="chip '+EST_CHIP[st[r.p]]+'">'+EST_TXT[st[r.p]]+'</span></td><td>'+nf(r.a,2)+'</td><td>'+(r.h?nf(r.h,1):'—')+'</td><td'+cls+'>'+(r.hha!=null?nf(r.hha,1):'—')+'</td>'+(t.estado==='feito'?'<td>'+(r.eha!=null?nf(r.eha,0):'—')+'</td>':'')+'</tr>';
+    }).join('')+
+    (hTot?'<tr class="tot"><td>Total</td><td></td><td>'+nf(haT/10000,2)+'</td><td>'+nf(hTot,1)+'</td><td>'+nf(hTot/(haT/10000),1)+'</td>'+(t.estado==='feito'?'<td>'+(custoTrab(t).total?nf(custoTrab(t).total/(haT/10000),0):'—')+'</td>':'')+'</tr>':'')+
+    '</tbody></table></div>'+
+    (Object.keys(horasParcRex(t)).length||!hTot?'':'<p class="note" style="margin:0">As horas por parcela son o total do traballo repartido pola superficie. Para o rendemento real de cada parcela, rexistra as horas de cada unha.</p>')+
+    '<p class="note" style="margin:0">Toca unha parcela para rexistrar traballo nela ou validala como feita. En verde o mellor rendemento (menos h/ha), en vermello o peor.</p>';
+  /* rexistros */
+  var rx=rexDe(t).slice().sort(function(a,b){return (b.data||'').localeCompare(a.data||'')});
+  html+='<h3 class="cats-t" style="margin-top:6px">Rexistros ('+rx.length+')</h3>'+(rx.length?'<ul class="mini-list">'+rx.map(function(r){
+    var hh=r.pp?Object.keys(r.pp).reduce(function(a,k){return a+(Number(r.pp[k])||0)},0):(Number(r.horas)||0);
+    return '<li><span>'+esc(nomesParcelas(r.parcelas))+(hh?' · '+nf(hh,1)+' h'+(r.pp?' (por parcela)':''):'')+(r.quen==='outro'&&r.persoas?' · '+esc(r.persoas):'')+'</span><time>'+fmtD(r.data)+'</time><button class="btn sm danger" type="button" data-act="seg-delrex" data-id="'+esc(r.id)+'">Borrar</button></li>';
+  }).join('')+'</ul>':'<p class="note">Aínda non hai nada rexistrado. Cando traballes nunha parcela, rexístrao e pasará a «en proceso».</p>');
+  $('#segBody').innerHTML=html;
+  /* mapa */
+  smap=null; ensureSmap();
+  ids.forEach(function(p){
+    var f=BYID[p], col=EST_COL[st[p]];
+    var poly=L.polygon(L.GeoJSON.coordsToLatLngs(f.geometry.coordinates,2),{color:col,weight:2.5,fillColor:col,fillOpacity:.55});
+    poly.bindTooltip(f.nome,{permanent:true,direction:'center',className:'plabel'});
+    poly.on('click',function(){ openSegPar(p) });
+    poly.addTo(slayers);
+  });
+  requestAnimationFrame(function(){ smap.invalidateSize(); var b=slayers.getBounds(); if(b.isValid()) smap.fitBounds(b,{padding:[24,24],maxZoom:18}) });
+}
+function openSegPar(pid){
+  var t=jobById(ui.sTrab), f=BYID[pid]; if(!t||!f) return;
+  var e=estadoParc(t,pid), rx=rexDe(t).filter(function(r){return r.parcelas.indexOf(pid)>-1}), h=(horasPorParcela(t)[pid])||0, fe=(t.feitas||{})[pid];
+  openSheet('<div class="sh-head"><div style="flex:1;min-width:0"><h2>'+esc(f.nome)+'</h2><div class="meta"><span class="chip '+EST_CHIP[e]+'">'+EST_TXT[e]+'</span><span class="chip" style="background:var(--surface);color:var(--muted)">'+esc(nomeTrab(t))+'</span></div></div><button class="ghost" type="button" data-act="close">Pechar</button></div>'+
+    '<dl class="facts"><dt>Superficie</dt><dd>'+supTxt(f)+'</dd><dt>Horas</dt><dd>'+(h?nf(h,1)+' h · '+nf(h/(f.superficie_m2/10000),1)+' h/ha':'—')+'</dd>'+(fe&&fe.data?'<dt>Validada</dt><dd>'+fmtD(fe.data)+'</dd>':'')+'</dl>'+
+    (rx.length?'<ul class="mini-list">'+rx.map(function(r){var hh=r.pp?r.pp[pid]:(r.horas?reparto({importe:Number(r.horas),parcelas:r.parcelas})[pid]:null);return '<li><span>'+(hh?nf(hh,1)+' h':'Sen horas')+(r.pp||r.parcelas.length===1||!hh?'':' (repartidas)')+'</span><time>'+fmtD(r.data)+'</time></li>'}).join('')+'</ul>':'<p class="note">Sen rexistros nesta parcela.</p>')+
+    '<div class="actions"><button class="btn line" type="button" data-act="seg-rex" data-id="'+esc(pid)+'">+ Rexistrar aquí</button>'+
+    (t.estado==='feito'?'':(e==='feita'?'<button class="btn danger" type="button" data-act="seg-feita" data-id="'+esc(pid)+'" data-v="0">Desfacer «feita»</button>':'<button class="btn" type="button" data-act="seg-feita" data-id="'+esc(pid)+'" data-v="1">Validar: está feita</button>'))+'</div>');
+}
+function openRex(pid){
+  var t=jobById(ui.sTrab); if(!t) return;
+  var ids=t.parcelas.filter(function(p){return BYID[p]}), pre=pid?[pid]:ids.filter(function(p){return estadoParc(t,p)!=='feita'});
+  openSheet('<form id="rf" novalidate data-modo="total">'+
+    '<div class="sh-head"><h2>Rexistrar traballo</h2><button class="ghost" type="button" data-act="close">Pechar</button></div>'+
+    '<p class="note">'+esc(nomeTrab(t))+'</p>'+
+    '<div class="field"><label for="r-data">Data</label><input type="date" id="r-data" value="'+hoxe()+'"></div>'+
+    '<fieldset class="field"><legend>Parcelas traballadas</legend><div class="pchips">'+ids.map(function(p){var f=BYID[p];return '<label class="chk"><input type="checkbox" name="parcela" value="'+esc(p)+'"'+(pre.indexOf(p)>-1?' checked':'')+'><span><i class="dot '+f.tenencia+'"></i>'+esc(f.nome)+'</span></label>'}).join('')+'</div></fieldset>'+
+    '<div class="field"><span class="l">Horas</span><div class="seg" role="group" aria-label="Como dar as horas"><button type="button" data-act="rex-modo" data-m="total" aria-pressed="true">Total (repártese)</button><button type="button" data-act="rex-modo" data-m="pp" aria-pressed="false">Por parcela</button></div></div>'+
+    '<div id="r-total" class="field"><input type="number" id="r-horas" inputmode="decimal" min="0" step="0.25" placeholder="Horas en total (opcional)"><p class="note" style="margin:4px 0 0">Repártense entre as parcelas marcadas segundo a superficie.</p></div>'+
+    '<div id="r-pp" hidden></div>'+
+    quenField('r','propio','')+
+    '<label class="chk" style="display:inline-block;margin:6px 0 12px"><input type="checkbox" id="r-feita"><span>Validar estas parcelas como feitas</span></label>'+
+    '<p class="err" id="r-err" role="alert"></p>'+
+    '<div class="actions"><button class="btn" type="submit">Gardar rexistro</button></div></form>');
+  rexPP();
+}
+function rexPP(){
+  var form=$('#rf'); if(!form) return;
+  var sel=$$('input[name=parcela]:checked',form).map(function(i){return i.value}), box=$('#r-pp',form), old={};
+  $$('input[data-pp]',box).forEach(function(i){old[i.getAttribute('data-pp')]=i.value});
+  box.innerHTML=sel.map(function(p){return '<div class="hrow"><span>'+esc(BYID[p].nome)+' <small class="sumline">'+haTxt(BYID[p].superficie_m2)+'</small></span><input type="number" inputmode="decimal" min="0" step="0.25" data-pp="'+esc(p)+'" placeholder="h" value="'+esc(old[p]||'')+'"></div>'}).join('')||'<p class="note">Marca as parcelas.</p>';
+}
+function saveRex(form){
+  var t=jobById(ui.sTrab); if(!t) return false;
+  var err=function(m){$('#r-err',form).textContent=m;return false};
+  var data=$('#r-data',form).value, ps=$$('input[name=parcela]:checked',form).map(function(i){return i.value});
+  if(!data) return err('Pon a data.');
+  if(!ps.length) return err('Marca polo menos unha parcela.');
+  var r={id:newId(),data:data,parcelas:ps,creado:new Date().toISOString()}, q=quenVal('r',form);
+  r.quen=q.quen; if(q.persoas) r.persoas=q.persoas;
+  if(form.getAttribute('data-modo')==='pp'){
+    var pp={}, any=false; $$('input[data-pp]',form).forEach(function(i){ var v=numOf(i); if(v!=null){ pp[i.getAttribute('data-pp')]=v; any=true } });
+    if(any) r.pp=pp;
+  } else { var h=numOf($('#r-horas',form)); if(h!=null) r.horas=h; }
+  t.rexistros=rexDe(t).concat([r]);
+  if($('#r-feita',form).checked){ t.feitas=Object.assign({},t.feitas); ps.forEach(function(p){ t.feitas[p]={data:data} }) }
+  if(!save(LS.tr,traballos)) return false;
+  closeSheet(); refreshAll(); toast('Rexistro gardado'); return true;
+}
+function setFeita(pid,on){
+  var t=jobById(ui.sTrab); if(!t) return;
+  t.feitas=Object.assign({},t.feitas);
+  if(on) t.feitas[pid]={data:hoxe()}; else delete t.feitas[pid];
+  save(LS.tr,traballos); closeSheet(); refreshAll(); toast(on?'Parcela validada como feita':'Parcela volve a «en proceso»');
+}
+function pecharTrab(){
+  var t=jobById(ui.sTrab); if(!t) return;
+  var ds=rexDe(t).map(function(r){return r.data}).concat(Object.keys(t.feitas||{}).map(function(k){return t.feitas[k].data})).filter(Boolean).sort();
+  var ini=ds[0]||hoxe(), fin=ds[ds.length-1]||ini, h=horasRex(t);
+  var q=rexDe(t).map(function(r){return r.quen==='outro'?(r.persoas||'Outro'):'propio'}), uq=q.filter(function(x,i){return q.indexOf(x)===i});
+  t.estado='feito'; t.dataFeita=ini; t.dataFeitaFin=fin>ini?fin:null;
+  if(h>0) t.horas=Math.round(h*100)/100;
+  if(uq.length===1){ if(uq[0]==='propio'){t.quen='propio';t.persoas=''} else {t.quen='outro';t.persoas=uq[0]} }
+  else if(uq.length>1){ t.quen='outro'; t.persoas=uq.map(function(x){return x==='propio'?'Propio':x}).join(', ') }
+  if(t.custoReal==null||t.custoReal==='') t.custoReal=t.custoPrev||null;
+  save(LS.tr,traballos); refreshAll(); toast('Traballo marcado como feito');
+  openForm(t.id);
+}
+/* rendemento por labor na campaña */
+function renderLabor(){
+  var actual=campDe(hoxe()); if(!ui.sCamp) ui.sCamp=actual;
+  var camps=[actual]; traballos.forEach(function(t){var c=campDe(iniDe(t)); if(c&&camps.indexOf(c)<0) camps.push(c)}); camps.sort().reverse();
+  var js=traballos.filter(function(t){return campDe(iniDe(t))===ui.sCamp&&(t.estado==='feito'||rexDe(t).length)});
+  var by={};
+  js.forEach(function(t){
+    var b=by[t.tipo]||(by[t.tipo]={n:0,m2:0,h:0,e:0,m2e:0,par:{}});
+    var hp=horasPorParcela(t), cp=custoParcelas(t);
+    b.n++;
+    Object.keys(hp).forEach(function(p){ if(!BYID[p]) return; var x=b.par[p]||(b.par[p]={h:0,m2:0,e:0,m2e:0}); x.h+=hp[p]; x.m2+=BYID[p].superficie_m2 });
+    var tm2=t.parcelas.reduce(function(a,p){return a+(BYID[p]?BYID[p].superficie_m2:0)},0);
+    b.m2+=tm2; b.h+=horasTrab(t);
+    if(t.estado==='feito'){ var c=custoTrab(t).total; b.e+=c; b.m2e+=tm2; Object.keys(cp).forEach(function(p){ if(!BYID[p]) return; var x=b.par[p]||(b.par[p]={h:0,m2:0,e:0,m2e:0}); x.e+=cp[p]; x.m2e+=BYID[p].superficie_m2 }) }
+  });
+  var tipos=Object.keys(by).sort(function(a,b){return by[b].h-by[a].h});
+  var html='<div class="filters"><select id="sCamp" aria-label="Campaña">'+camps.map(function(c){return '<option value="'+c+'"'+(c===ui.sCamp?' selected':'')+'>'+campTxt(c)+' ('+campRango(+c)+')</option>'}).join('')+'</select></div>'+
+    '<p class="note" style="margin:0">Rendemento de cada labor nos traballos feitos ou en curso da campaña. Toca unha labor para velo parcela a parcela.</p>';
+  if(!tipos.length){ $('#segBody').innerHTML=html+'<div class="empty"><div><b>Sen datos nesta campaña.</b>Cando marques traballos como feitos ou rexistres horas, aparece aquí o rendemento.</div></div>'; bindSCamp(); return; }
+  html+='<div class="tblwrap"><table class="tbl"><thead><tr><th>Labor</th><th>Trab.</th><th>ha</th><th>Horas</th><th>h/ha</th><th>€/ha</th></tr></thead><tbody>'+
+    tipos.map(function(k){
+      var b=by[k], on=ui.sLab===k;
+      var r='<tr class="click'+(on?' on':'')+'" data-act="seg-lab" data-id="'+esc(k)+'"><td>'+esc(k)+'</td><td>'+b.n+'</td><td>'+nf(b.m2/10000,2)+'</td><td>'+(b.h?nf(b.h,1):'—')+'</td><td>'+(b.h&&b.m2?nf(b.h/(b.m2/10000),1):'—')+'</td><td>'+(b.e&&b.m2e?nf(b.e/(b.m2e/10000),0):'—')+'</td></tr>';
+      if(on){
+        var ps=Object.keys(b.par).map(function(p){var x=b.par[p];return {p:p,hha:x.h&&x.m2?x.h/(x.m2/10000):null,eha:x.e&&x.m2e?x.e/(x.m2e/10000):null,h:x.h}}).sort(function(a,c){return (a.hha==null)-(c.hha==null)||(a.hha||0)-(c.hha||0)});
+        var hs=ps.filter(function(x){return x.hha!=null}).map(function(x){return x.hha}), mn=Math.min.apply(null,hs), mx=Math.max.apply(null,hs);
+        r+=ps.map(function(x){var cls=hs.length>1&&x.hha!=null?(x.hha===mn?' class="best"':x.hha===mx?' class="worst"':''):'';return '<tr class="sub"><td>↳ '+esc(BYID[x.p].nome)+'</td><td></td><td>'+nf(BYID[x.p].superficie_m2/10000,2)+'</td><td>'+(x.h?nf(x.h,1):'—')+'</td><td'+cls+'>'+(x.hha!=null?nf(x.hha,1):'—')+'</td><td>'+(x.eha!=null?nf(x.eha,0):'—')+'</td></tr>'}).join('');
+      }
+      return r;
+    }).join('')+'</tbody></table></div>'+
+    '<p class="note" style="margin:0">h/ha e €/ha calcúlanse sobre a superficie traballada (se unha parcela se traballou dúas veces, conta dúas). En verde a parcela máis rápida, en vermello a máis lenta.</p>';
+  $('#segBody').innerHTML=html; bindSCamp();
+}
+function bindSCamp(){ var s=$('#sCamp'); if(s) s.onchange=function(){ui.sCamp=s.value;ui.sLab='';saveUi();renderLabor()} }
+
 /* ---------- gastos e inversións ---------- */
 function entradas(){
   var out=[];
@@ -3184,6 +3486,19 @@ function entradas(){
     out.push({origen:'mao',gid:null,job:t,data:t.estado==='feito'?t.dataFeita:t.dataPrev,concepto:t.tipo+' · man de obra e servizos',categoria:'Man de obra e servizos',natureza:'gasto',importe:imp,parcelas:t.parcelas,previsto:t.estado==='planificado'});
   });
   return out;
+}
+function renderComp(reais){
+  var box=$('#gComp'); if(!box) return;
+  if(ui.gCamp!=='todas'){ box.innerHTML=''; return; }
+  var m2=FEATS.reduce(function(a,f){return a+f.superficie_m2},0), ha=m2/10000, by={};
+  var B=function(c){return by[c]||(by[c]={g:0,i:0,h:0})};
+  reais.forEach(function(e){ var c=campDe(e.data); if(!c) return; if(e.natureza==='inversion') B(c).i+=e.importe; else B(c).g+=e.importe });
+  traballos.forEach(function(t){ var c=campDe(iniDe(t)); var h=horasTrab(t); if(c&&h) B(c).h+=h });
+  var cs=Object.keys(by).sort().reverse();
+  if(!cs.length){ box.innerHTML=''; return; }
+  box.innerHTML='<h3 class="cats-t">Comparativa entre campañas</h3><div class="tblwrap"><table class="tbl"><thead><tr><th>Campaña</th><th>Gastos</th><th>Inversións</th><th>Total</th><th>€/ha</th><th>Horas</th><th>h/ha</th></tr></thead><tbody>'+
+    cs.map(function(c){var b=by[c], tot=b.g+b.i; return '<tr class="click" data-act="gcomp" data-id="'+c+'"><td>'+c+'</td><td>'+eur(b.g)+'</td><td>'+eur(b.i)+'</td><td><b>'+eur(tot)+'</b></td><td>'+(ha?eur(tot/ha):'—')+'</td><td>'+(b.h?nf(b.h,1):'—')+'</td><td>'+(b.h&&ha?nf(b.h/ha,1):'—')+'</td></tr>'}).join('')+
+    '</tbody></table></div><p class="note" style="margin:6px 0 0">Gastos reais. €/ha e h/ha sobre a superficie actual ('+nf(ha,2)+' ha): nas campañas en que tiñas outras parcelas son aproximados. Toca unha campaña para ver o seu detalle.</p>';
 }
 function setOptions(sel,html,val){ if(sel.getAttribute('data-sig')!==html){sel.innerHTML=html;sel.setAttribute('data-sig',html)} sel.value=val }
 function renderGastos(){
@@ -3198,6 +3513,7 @@ function renderGastos(){
 
   var gp=ui.gPar||'';
   $('#gPar').value=gp;
+  renderComp(reais);
   var anoSet=reais.filter(function(e){return ui.gCamp==='todas'||campDe(e.data)===ui.gCamp});
   prev=prev.filter(function(e){return ui.gCamp==='todas'||!e.data||campDe(e.data)===ui.gCamp});
   /* co filtro de parcela, cada apunte conta só pola parte imputada a esa parcela */
@@ -3733,6 +4049,125 @@ function exportar(){
   document.body.appendChild(a); a.click(); a.remove(); setTimeout(function(){URL.revokeObjectURL(a.href)},1500);
   var m=$('#d-msg'); if(m) m.textContent='Copia exportada. Gárdaa nun sitio seguro (correo, nube…).';
 }
+/* ---- escritor .xlsx mínimo: zip sen compresión + XML de SpreadsheetML ---- */
+var CRCT=(function(){var t=[],c;for(var n=0;n<256;n++){c=n;for(var k=0;k<8;k++)c=c&1?0xEDB88320^(c>>>1):c>>>1;t[n]=c>>>0}return t})();
+function crc32(u){var c=0xFFFFFFFF;for(var i=0;i<u.length;i++)c=CRCT[(c^u[i])&255]^(c>>>8);return (c^0xFFFFFFFF)>>>0}
+function zipStore(files){
+  var enc=new TextEncoder(), parts=[], cen=[], off=0;
+  var u16=function(v){return [v&255,(v>>8)&255]}, u32=function(v){return [v&255,(v>>8)&255,(v>>16)&255,(v>>>24)&255]};
+  files.forEach(function(f){
+    var name=enc.encode(f.name), data=enc.encode(f.data), crc=crc32(data);
+    var loc=[].concat(u32(0x04034b50),u16(20),u16(0x0800),u16(0),u16(0),u16(0x21),u32(crc),u32(data.length),u32(data.length),u16(name.length),u16(0));
+    parts.push(new Uint8Array(loc),name,data);
+    cen.push([].concat(u32(0x02014b50),u16(20),u16(20),u16(0x0800),u16(0),u16(0),u16(0x21),u32(crc),u32(data.length),u32(data.length),u16(name.length),u16(0),u16(0),u16(0),u16(0),u32(0),u32(off)),name);
+    off+=loc.length+name.length+data.length;
+  });
+  var csize=0; cen.forEach(function(c,i){ if(i%2===0){ parts.push(new Uint8Array(c)); csize+=c.length } else { parts.push(c); csize+=c.length } });
+  parts.push(new Uint8Array([].concat(u32(0x06054b50),u16(0),u16(0),u16(files.length),u16(files.length),u32(csize),u32(off),u16(0))));
+  return new Blob(parts,{type:'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'});
+}
+function xe(s){return String(s).replace(/[&<>"]/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]}).replace(/[\u0000-\u0008\u000B\u000C\u000E-\u001F]/g,'')}
+function colL(i){var s='';i++;while(i>0){var m=(i-1)%26;s=String.fromCharCode(65+m)+s;i=Math.floor((i-1)/26)}return s}
+/* celas: {v, t:'s'|'n'|'d'|'e'(euros)|'h'(decimal)} ; estilos: 1 cabeceira, 2 data, 3 euros, 4 decimal, 5 total euros */
+function sheetXml(cols,rows,totals){
+  var x='<?xml version="1.0" encoding="UTF-8" standalone="yes"?><worksheet xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main"><sheetViews><sheetView workbookViewId="0"><pane ySplit="1" topLeftCell="A2" activePane="bottomLeft" state="frozen"/></sheetView></sheetViews><cols>'+
+    cols.map(function(c,i){return '<col min="'+(i+1)+'" max="'+(i+1)+'" width="'+(c.w||14)+'" customWidth="1"/>'}).join('')+'</cols><sheetData>';
+  var cell=function(r,i,v,t,st){
+    var ref=colL(i)+r;
+    if(v==null||v==='') return '';
+    if(t==='d'){ var p=String(v).split('-').map(Number); if(p.length!==3||isNaN(p[0])) return '<c r="'+ref+'" t="inlineStr"><is><t>'+xe(v)+'</t></is></c>'; var n=(Date.UTC(p[0],p[1]-1,p[2])-Date.UTC(1899,11,30))/86400000; return '<c r="'+ref+'" s="2"><v>'+n+'</v></c>'; }
+    if(t==='n'||t==='e'||t==='h'){ var num=Number(v); if(isNaN(num)) return ''; return '<c r="'+ref+'" s="'+(st||(t==='e'?3:t==='h'?4:0))+'"><v>'+num+'</v></c>'; }
+    return '<c r="'+ref+'"'+(st?' s="'+st+'"':'')+' t="inlineStr"><is><t xml:space="preserve">'+xe(v)+'</t></is></c>';
+  };
+  x+='<row r="1">'+cols.map(function(c,i){return cell(1,i,c.h,'s',1)}).join('')+'</row>';
+  rows.forEach(function(row,ri){ x+='<row r="'+(ri+2)+'">'+cols.map(function(c,i){return cell(ri+2,i,row[i],c.t)}).join('')+'</row>'; });
+  if(totals&&rows.length){
+    var r=rows.length+2;
+    x+='<row r="'+r+'">'+cols.map(function(c,i){
+      if(i===0) return cell(r,0,totals.label||'TOTAL','s',1);
+      if(totals.cols.indexOf(i)<0) return '';
+      var rg=function(k){return colL(k)+'2:'+colL(k)+(r-1)};
+      var f=totals.cond?'SUMIF('+rg(totals.cond[0])+',&quot;'+totals.cond[1]+'&quot;,'+rg(i)+')':'SUM('+rg(i)+')';
+      return '<c r="'+colL(i)+r+'" s="'+(c.t==='e'?5:6)+'"><f>'+f+'</f></c>';
+    }).join('')+'</row>';
+  }
+  return x+'</sheetData>'+(rows.length?'<autoFilter ref="A1:'+colL(cols.length-1)+(rows.length+1)+'"/>':'')+'</worksheet>';
+}
+function xlsxBlob(sheets){
+  var files=[
+    {name:'[Content_Types].xml',data:'<?xml version="1.0" encoding="UTF-8" standalone="yes"?><Types xmlns="http://schemas.openxmlformats.org/package/2006/content-types"><Default Extension="rels" ContentType="application/vnd.openxmlformats-package.relationships+xml"/><Default Extension="xml" ContentType="application/xml"/><Override PartName="/xl/workbook.xml" ContentType="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet.main+xml"/><Override PartName="/xl/styles.xml" ContentType="application/vnd.openxmlformats-officedocument.spreadsheetml.styles+xml"/>'+
+      sheets.map(function(s,i){return '<Override PartName="/xl/worksheets/sheet'+(i+1)+'.xml" ContentType="application/vnd.openxmlformats-officedocument.spreadsheetml.worksheet+xml"/>'}).join('')+'</Types>'},
+    {name:'_rels/.rels',data:'<?xml version="1.0" encoding="UTF-8" standalone="yes"?><Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships"><Relationship Id="rId1" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/officeDocument" Target="xl/workbook.xml"/></Relationships>'},
+    {name:'xl/workbook.xml',data:'<?xml version="1.0" encoding="UTF-8" standalone="yes"?><workbook xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main" xmlns:r="http://schemas.openxmlformats.org/officeDocument/2006/relationships"><sheets>'+
+      sheets.map(function(s,i){return '<sheet name="'+xe(s.name)+'" sheetId="'+(i+1)+'" r:id="rId'+(i+1)+'"/>'}).join('')+'</sheets>'+
+      '<definedNames>'+sheets.map(function(s,i){return s.rows.length?'<definedName name="_xlnm._FilterDatabase" localSheetId="'+i+'" hidden="1">\''+xe(s.name)+'\'!$A$1:$'+colL(s.cols.length-1)+'$'+(s.rows.length+1)+'</definedName>':''}).join('')+'</definedNames></workbook>'},
+    {name:'xl/_rels/workbook.xml.rels',data:'<?xml version="1.0" encoding="UTF-8" standalone="yes"?><Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships">'+
+      sheets.map(function(s,i){return '<Relationship Id="rId'+(i+1)+'" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/worksheet" Target="worksheets/sheet'+(i+1)+'.xml"/>'}).join('')+
+      '<Relationship Id="rId'+(sheets.length+1)+'" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/styles" Target="styles.xml"/></Relationships>'},
+    {name:'xl/styles.xml',data:'<?xml version="1.0" encoding="UTF-8" standalone="yes"?><styleSheet xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main"><numFmts count="3"><numFmt numFmtId="164" formatCode="dd/mm/yyyy"/><numFmt numFmtId="165" formatCode="#,##0.00 &quot;€&quot;"/><numFmt numFmtId="166" formatCode="#,##0.00"/></numFmts>'+
+      '<fonts count="2"><font><sz val="11"/><name val="Calibri"/></font><font><b/><sz val="11"/><name val="Calibri"/></font></fonts>'+
+      '<fills count="3"><fill><patternFill patternType="none"/></fill><fill><patternFill patternType="gray125"/></fill><fill><patternFill patternType="solid"><fgColor rgb="FFDCE8F4"/><bgColor indexed="64"/></patternFill></fill></fills>'+
+      '<borders count="1"><border><left/><right/><top/><bottom/><diagonal/></border></borders><cellStyleXfs count="1"><xf numFmtId="0" fontId="0" fillId="0" borderId="0"/></cellStyleXfs>'+
+      '<cellXfs count="7"><xf numFmtId="0" fontId="0" fillId="0" borderId="0" xfId="0"/><xf numFmtId="0" fontId="1" fillId="2" borderId="0" xfId="0" applyFont="1" applyFill="1"/><xf numFmtId="164" fontId="0" fillId="0" borderId="0" xfId="0" applyNumberFormat="1"/><xf numFmtId="165" fontId="0" fillId="0" borderId="0" xfId="0" applyNumberFormat="1"/><xf numFmtId="166" fontId="0" fillId="0" borderId="0" xfId="0" applyNumberFormat="1"/><xf numFmtId="165" fontId="1" fillId="2" borderId="0" xfId="0" applyNumberFormat="1" applyFont="1" applyFill="1"/><xf numFmtId="166" fontId="1" fillId="2" borderId="0" xfId="0" applyNumberFormat="1" applyFont="1" applyFill="1"/></cellXfs>'+
+      '<cellStyles count="1"><cellStyle name="Normal" xfId="0" builtinId="0"/></cellStyles></styleSheet>'}
+  ];
+  sheets.forEach(function(s,i){ files.push({name:'xl/worksheets/sheet'+(i+1)+'.xml',data:sheetXml(s.cols,s.rows,s.totals)}) });
+  return zipStore(files);
+}
+function nomesTodos(ids){ return (ids||[]).filter(function(i){return BYID[i]}).map(function(i){return BYID[i].nome}).join(', ') }
+function datosExcel(){
+  var camp=ui.gCamp||campDe(hoxe()), enCamp=function(d){return camp==='todas'||(d&&campDe(d)===camp)};
+  var ORIX={directo:'Gasto directo',traballo:'Material de traballo',mao:'Man de obra e servizos'};
+  /* Gastos: todos os apuntes (reais e previstos) da campaña */
+  var ents=entradas().filter(function(e){return enCamp(e.data)}).sort(function(a,b){return (a.data||'').localeCompare(b.data||'')});
+  var gRows=ents.map(function(e){
+    var ids=(e.parcelas||[]).filter(function(i){return BYID[i]});
+    return [e.data||'',campDe(e.data)?+campDe(e.data):'',e.concepto,e.categoria,e.natureza==='inversion'?'Inversión':'Gasto',e.importe,e.previsto?'Previsto':'Real',ORIX[e.origen]||'',e.job?e.job.tipo:'',ids.length?nomesTodos(ids):'Xeral',e.cantidade!=null?e.cantidade:'',e.unidade||'',e.provedor||''];
+  });
+  /* Traballos con horas */
+  var ts=traballos.filter(function(t){return enCamp(iniDe(t))}).sort(function(a,b){return (iniDe(a)||'').localeCompare(iniDe(b)||'')});
+  var tRows=ts.map(function(t){
+    var ini=iniDe(t), fin=finDe(t), c=custoTrab(t), ids=(t.parcelas||[]).filter(function(i){return BYID[i]});
+    var sup=ids.reduce(function(a,i){return a+BYID[i].superficie_m2},0)/10000;
+    var hT=horasTrab(t);
+    return [t.tipo,t.estado==='feito'?'Feito':(rexDe(t).length?'En curso':'Planificado'),ini||'',fin||'',ini?nDias(ini,fin):'',hT?round2(hT):'',(hT&&sup)?Math.round(hT/sup*100)/100:'',(t.estado==='feito'||rexDe(t).length)?quenTxt(t):'',nomesTodos(ids),sup?Math.round(sup*10000)/10000:'',c.mao||'',c.mats||'',c.total||'',t.produto||'',t.dose||'',t.notas||''];
+  });
+  /* Por parcela: reparto por superficie de gastos reais e horas feitas */
+  var bp={};
+  var acc=function(k){return bp[k]||(bp[k]={g:0,i:0,h:0})};
+  ents.forEach(function(e){ if(e.previsto) return; var r=reparto(e); Object.keys(r).forEach(function(k){ var a=acc(k); if(e.natureza==='inversion') a.i+=r[k]; else a.g+=r[k]; }) });
+  ts.forEach(function(t){ var r=horasPorParcela(t); Object.keys(r).forEach(function(k){ acc(k).h+=r[k] }) });
+  var sRows=[];
+  ts.forEach(function(t){ var hp=horasPorParcela(t); (t.parcelas||[]).filter(function(p){return BYID[p]}).forEach(function(p){ var a=BYID[p].superficie_m2/10000, h=hp[p]||0, fe=(t.feitas||{})[p];
+    sRows.push([t.tipo,iniDe(t)||'',BYID[p].nome,EST_TXT[estadoParc(t,p)],fe&&fe.data?fe.data:'',Math.round(a*10000)/10000,h?round2(h):'',h&&a?round2(h/a):'']) }) });
+  var pRows=FEATS.map(function(f){
+    var a=bp[f.id]||{g:0,i:0,h:0}, ha=f.superficie_m2/10000;
+    return [f.nome,f.id,TEN[f.tenencia],Math.round(ha*10000)/10000,round2(a.g),round2(a.i),round2(a.g+a.i),ha?round2((a.g+a.i)/ha):'',round2(a.h),ha?round2(a.h/ha):''];
+  });
+  if(bp.__xeral) pRows.push(['Xeral (sen parcela)','','','',round2(bp.__xeral.g),round2(bp.__xeral.i),round2(bp.__xeral.g+bp.__xeral.i),'',round2(bp.__xeral.h),'']);
+  return {camp:camp,sheets:[
+    {name:'Gastos',totals:{cols:[5],cond:[6,'Real'],label:'TOTAL reais'},cols:[{h:'Data',t:'d',w:12},{h:'Campaña',t:'n',w:10},{h:'Concepto',w:34},{h:'Categoría',w:24},{h:'Tipo',w:11},{h:'Importe (€)',t:'e',w:14},{h:'Estado',w:10},{h:'Orixe',w:22},{h:'Traballo',w:22},{h:'Parcelas',w:34},{h:'Cantidade',t:'h',w:11},{h:'Unidade',w:10},{h:'Provedor',w:20}],rows:gRows},
+    {name:'Traballos',totals:{cols:[5,10,11,12],cond:[1,'Feito'],label:'TOTAL feitos'},cols:[{h:'Traballo',w:24},{h:'Estado',w:12},{h:'Inicio',t:'d',w:12},{h:'Fin',t:'d',w:12},{h:'Días',t:'n',w:7},{h:'Horas',t:'h',w:9},{h:'Horas/ha',t:'h',w:10},{h:'Quen o fixo',w:18},{h:'Parcelas',w:34},{h:'Superficie (ha)',t:'h',w:14},{h:'Man de obra (€)',t:'e',w:15},{h:'Materiais (€)',t:'e',w:14},{h:'Total (€)',t:'e',w:13},{h:'Produto',w:18},{h:'Dose',w:12},{h:'Notas',w:40}],rows:tRows},
+    {name:'Seguimento',totals:{cols:[6]},cols:[{h:'Traballo',w:24},{h:'Inicio',t:'d',w:12},{h:'Parcela',w:24},{h:'Estado',w:12},{h:'Validada',t:'d',w:12},{h:'Superficie (ha)',t:'h',w:14},{h:'Horas',t:'h',w:9},{h:'Horas/ha',t:'h',w:10}],rows:sRows},
+    {name:'Por parcela',totals:{cols:[3,4,5,6,8]},cols:[{h:'Parcela',w:24},{h:'Código',w:12},{h:'Tenza',w:12},{h:'Superficie (ha)',t:'h',w:14},{h:'Gastos (€)',t:'e',w:13},{h:'Inversións (€)',t:'e',w:14},{h:'Total (€)',t:'e',w:13},{h:'€/ha',t:'e',w:12},{h:'Horas',t:'h',w:9},{h:'Horas/ha',t:'h',w:10}],rows:pRows}
+  ]};
+}
+function round2(v){return Math.round((Number(v)||0)*100)/100}
+function descargarExcel(){
+  var d=datosExcel(), blob=xlsxBlob(d.sheets);
+  var nome='xestion-vinedo-'+(d.camp==='todas'?'todas-campanas':'campana-'+d.camp)+'-'+hoxe()+'.xlsx';
+  var nG=d.sheets[0].rows.length, nT=d.sheets[1].rows.length;
+  var note=$('#xlsNote'); if(note) note.textContent=nG+' apuntes e '+nT+' traballos'+(d.camp==='todas'?'':' da '+campTxt(d.camp).toLowerCase());
+  var file=null; try{ file=new File([blob],nome,{type:blob.type}) }catch(e){}
+  var touch=window.matchMedia&&window.matchMedia('(pointer:coarse)').matches;
+  if(touch&&file&&navigator.canShare&&navigator.canShare({files:[file]})){
+    navigator.share({files:[file],title:nome}).catch(function(){});
+    return;
+  }
+  var a=document.createElement('a'); a.href=URL.createObjectURL(blob); a.download=nome;
+  document.body.appendChild(a); a.click(); a.remove(); setTimeout(function(){URL.revokeObjectURL(a.href)},4000);
+  toast('Excel descargado');
+}
 var pendingImport=null;
 $('#fileImport').addEventListener('change',function(e){
   var f=e.target.files[0]; e.target.value=''; if(!f) return;
@@ -3777,7 +4212,7 @@ function updFab(){
   if(t==='trab'){fab.textContent='+ Novo traballo';fab.setAttribute('data-act','newjob')}
   if(t==='gast'){fab.textContent='+ Novo gasto';fab.setAttribute('data-act','newgasto')}
 }
-function refreshAll(){renderResumo();renderFiltros();renderLista();renderMapCard();renderTrab();renderGastos();renderNotas()}
+function refreshAll(){renderResumo();renderFiltros();renderLista();renderMapCard();renderTrab();renderGastos();renderNotas();setTimeout(updMapSum,0)}
 function rebuildAll(){buildFeats();rebuildLayers();restyle();populateParcelaSelect();refreshAll()}
 
 /* ---------- eventos ---------- */
@@ -3794,7 +4229,7 @@ document.addEventListener('click',function(e){
   var act=el.getAttribute('data-act'), id=el.getAttribute('data-id'), form;
   switch(act){
     case 'tab': if(drawing&&el.getAttribute('data-tab')!=='expl') endDraw(); if(editing&&el.getAttribute('data-tab')!=='expl') endEdit(); setTab(el.getAttribute('data-tab')); break;
-    case 'filtro': ui.filtro=el.getAttribute('data-f'); saveUi(); applyFiltro(); renderFiltros(); renderLista(); fitAll(); break;
+    case 'filtro': ui.filtro=el.getAttribute('data-f'); saveUi(); applyFiltro(); renderResumo(); renderFiltros(); renderLista(); fitAll(); break;
     case 'parcela': selectId(id); openFicha(id); break;
     case 'ficha': openFicha(id); break;
     case 'vermapa': closeSheet(); setTab('expl'); selectId(id); zoomToId(id); $('#mapbox').scrollIntoView({block:'start',behavior:'smooth'}); break;
@@ -3903,6 +4338,23 @@ document.addEventListener('click',function(e){
         $$('[data-act="imp-ten"][data-i="'+k+'"]').forEach(function(b){b.setAttribute('aria-pressed',String(b.getAttribute('data-t')===tt))}); });
       $$('#if .imp-row .field .l').forEach(function(l){l.textContent='Tenza';l.style.color=''}); break;
     case 'export': exportar(); break;
+    case 'xls': descargarExcel(); break;
+    case 'quen-form':
+      var qw=el.closest('.quenf'), qv=el.getAttribute('data-q'); qw.setAttribute('data-q',qv);
+      $$('[data-act="quen-form"]',qw).forEach(function(b){b.setAttribute('aria-pressed',String(b===el))});
+      var qi=$('input[type=text]',qw); qi.hidden=qv!=='outro'; if(qv==='outro') try{qi.focus()}catch(x){} break;
+    case 'seg-rex': closeSheet(); openRex(id); break;
+    case 'seg-par': openSegPar(id); break;
+    case 'seg-feita': setFeita(id,el.getAttribute('data-v')==='1'); break;
+    case 'seg-pechar': pecharTrab(); break;
+    case 'seg-delrex':
+      armDelete(el,'Confirmar',function(){ var t=jobById(ui.sTrab); if(!t) return; t.rexistros=rexDe(t).filter(function(r){return r.id!==id}); save(LS.tr,traballos); refreshAll(); toast('Rexistro borrado') }); break;
+    case 'seg-lab': ui.sLab=ui.sLab===id?'':id; saveUi(); renderLabor(); break;
+    case 'rex-modo':
+      var rf=$('#rf'), mm=el.getAttribute('data-m'); rf.setAttribute('data-modo',mm);
+      $$('[data-act="rex-modo"]',rf).forEach(function(b){b.setAttribute('aria-pressed',String(b===el))});
+      $('#r-total',rf).hidden=mm!=='total'; $('#r-pp',rf).hidden=mm!=='pp'; rexPP(); break;
+    case 'gcomp': ui.gCamp=id; saveUi(); renderGastos(); window.scrollTo(0,0); break;
     case 'import': $('#fileImport').click(); break;
     case 'confirm-import': confirmImport(); break;
   }
@@ -3917,6 +4369,7 @@ document.addEventListener('submit',function(e){
   else if(id==='nf') saveNota(e.target);
   else if(id==='if') saveImport(e.target);
   else if(id==='lf') doLogin(e.target);
+  else if(id==='rf') saveRex(e.target);
   else if(id==='cf'){
     var c=parseCfg($('#c-txt',e.target).value);
     if(!c){ $('#c-err',e.target).textContent='Non atopo apiKey, projectId e appId nese texto.'; }
@@ -3936,6 +4389,8 @@ document.addEventListener('change',function(e){
 $('#gAno').addEventListener('change',function(e){ui.gCamp=e.target.value;saveUi();renderGastos()});
 $('#gCat').addEventListener('change',function(e){ui.gCat=e.target.value;saveUi();renderGastos()});
 $('#gPar').addEventListener('change',function(e){ui.gPar=e.target.value;saveUi();renderGastos()});
+$('#sTrab').addEventListener('change',function(e){ui.sTrab=e.target.value;saveUi();renderSeg()});
+document.addEventListener('change',function(e){ if(e.target.name==='parcela'&&e.target.closest('#rf')) rexPP() });
 $('#nParcela').addEventListener('change',function(e){ui.nPar=e.target.value;saveUi();renderNotas()});
 $('#nBusca').addEventListener('input',renderNotas);
 document.addEventListener('change',function(e){
@@ -3955,7 +4410,7 @@ window.addEventListener('online',function(){sync.offline=false;updSyncUi()});
 window.addEventListener('offline',function(){sync.offline=true;updSyncUi()});
 sync.offline=navigator.onLine===false;
 initSync();
-if(window.__VD_TEST) window.__vd={map:map,bases:bases,pt:function(lat,lng){map.fire('click',{latlng:L.latLng(lat,lng)})},custom:function(){return custom},sync:sync,data:function(){return {traballos:traballos,gastos:gastos,notas:notas,custom:custom,ov:ov}},editing:function(){return editing},notas:function(){return notas},utmInv:utmInv};
+if(window.__VD_TEST) window.__vd={map:map,bases:bases,pt:function(lat,lng){map.fire('click',{latlng:L.latLng(lat,lng)})},custom:function(){return custom},smap:function(){return smap},excel:function(){return datosExcel()},xlsx:function(){var d=datosExcel();return xlsxBlob(d.sheets)},sync:sync,data:function(){return {traballos:traballos,gastos:gastos,notas:notas,custom:custom,ov:ov}},editing:function(){return editing},notas:function(){return notas},utmInv:utmInv};
 
 if('serviceWorker' in navigator && /^https?:$/.test(location.protocol)){
   window.addEventListener('load',function(){navigator.serviceWorker.register('sw.js').catch(function(){})});
