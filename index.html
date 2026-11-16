@@ -1034,7 +1034,7 @@ input[type=search]{width:100%;background:var(--card);border:1px solid var(--line
       <div class="filters" id="fParcelaWrap"><select id="fParcela" aria-label="Filtrar por parcela"></select></div>
 
       <div id="segBox" class="view" style="padding:0" hidden>
-        <div class="filters"><select id="sTrab" aria-label="Traballo a seguir"></select></div>
+        <div class="filters"><select id="sTrab" aria-label="Campaña"></select></div>
         <div id="segBody" class="view" style="padding:0"></div>
       </div>
 
@@ -2511,12 +2511,13 @@ var ov = load(LS.pc,{});
 var gastos = load(LS.ga,[]);
 var custom = load(LS.cu,[]);
 var notas = load(LS.no,[]);
+var segst = load('vd.seg.v1',{});
 var ui = Object.assign({tab:'expl',esub:'parcelas',filtro:'todas',estado:'planificado',parcela:'',base:'pnoa',vista:'lista',gNat:'todo',gCamp:null,gCat:'',gPar:'',nPar:''}, load(LS.ui,{}));
 var saveUi=function(){try{localStorage.setItem(LS.ui,JSON.stringify(ui))}catch(e){}};
 try{ if(navigator.storage&&navigator.storage.persist) navigator.storage.persist(); }catch(e){}
 
 /* ---------- constantes ---------- */
-var TIPOS=['Poda de inverno','Atado','Poda en verde','Tratamento fitosanitario','Abonado','Desbroce / sega','Laboreo','Reposición de marras','Reparación de parra','Vendima','Outro'];
+var TIPOS=['Poda de inverno','Baixar madeira de poda','Triturado de vides','Atado','Poda en verde','Tratamento fitosanitario','Abonado','Desbroce / sega','Laboreo','Reposición de marras','Reparación de parra','Vendima','Outro'];
 var CATS=['Materiais','Fitosanitarios','Abonos e enmendas','Planta e plantación','Man de obra e servizos','Maquinaria e combustible','Rego','Seguros e cotas','Taxas e impostos','Alugueiros','Outros'];
 var TEN={propiedade:'Propiedade',alugada:'Alugada'};
 function defCat(tipo){return tipo==='Tratamento fitosanitario'?'Fitosanitarios':tipo==='Abonado'?'Abonos e enmendas':tipo==='Reposición de marras'?'Planta e plantación':'Materiais'}
@@ -3284,6 +3285,7 @@ function horasRex(t){ var h=horasParcRex(t); return Object.keys(h).reduce(functi
 function horasTrab(t){ var r=horasRex(t); return r>0?r:(t.estado==='feito'&&t.horas?Number(t.horas):0) }
 /* horas por parcela para o rendemento: rexistros se os hai; se non, as horas do traballo repartidas pola superficie */
 function horasPorParcela(t){
+  if(t.hpp&&!rexDe(t).length){ var o={}; Object.keys(t.hpp).forEach(function(k){ if(t.hpp[k]!=null&&t.hpp[k]!=='') o[k]=Number(t.hpp[k]) }); if(Object.keys(o).length) return o; }
   var hp=horasParcRex(t);
   if(Object.keys(hp).length) return hp;
   if(t.estado==='feito'&&t.horas){ var rp=reparto({importe:Number(t.horas),parcelas:t.parcelas}); delete rp.__xeral; return rp }
@@ -3301,8 +3303,8 @@ function custoParcelas(t){
   /* custo do traballo repartido: polas horas se as hai por parcela, se non pola superficie */
   var c=custoTrab(t), tot=t.estado==='feito'?c.total:0, out={};
   if(!tot) return out;
-  var hp=horasParcRex(t), sh=Object.keys(hp).reduce(function(a,k){return a+hp[k]},0);
-  if(sh>0) Object.keys(hp).forEach(function(k){ out[k]=tot*hp[k]/sh });
+  var hp=horasPorParcela(t), sh=Object.keys(hp).reduce(function(a,k){return a+hp[k]},0);
+  if(sh>0&&(t.hpp||rexDe(t).length)) Object.keys(hp).forEach(function(k){ out[k]=tot*hp[k]/sh });
   else { var rp=reparto({importe:tot,parcelas:t.parcelas}); delete rp.__xeral; out=rp }
   return out;
 }
@@ -3314,7 +3316,7 @@ function ensureSmap(){
   sbase=L.tileLayer(src._url,Object.assign({},src.options)).addTo(smap);
   slayers=L.featureGroup().addTo(smap);
 }
-function renderSeg(){
+function renderSegVello(){
   var sel=$('#sTrab');
   var js=traballos.filter(function(t){return t.parcelas&&t.parcelas.length&&iniDe(t)}).slice().sort(function(a,b){return (iniDe(b)||'').localeCompare(iniDe(a)||'')});
   var grp={}; js.forEach(function(t){ var c=campDe(iniDe(t))||'—'; (grp[c]=grp[c]||[]).push(t) });
@@ -3398,7 +3400,7 @@ function openRex(pid){
   rexPP();
 }
 function rexPP(){
-  var form=$('#rf'); if(!form) return;
+  var form=$('#rf')||$('#pf2'); if(!form) return;
   var sel=$$('input[name=parcela]:checked',form).map(function(i){return i.value}), box=$('#r-pp',form), old={};
   $$('input[data-pp]',box).forEach(function(i){old[i.getAttribute('data-pp')]=i.value});
   box.innerHTML=sel.map(function(p){return '<div class="hrow"><span>'+esc(BYID[p].nome)+' <small class="sumline">'+haTxt(BYID[p].superficie_m2)+'</small></span><input type="number" inputmode="decimal" min="0" step="0.25" data-pp="'+esc(p)+'" placeholder="h" value="'+esc(old[p]||'')+'"></div>'}).join('')||'<p class="note">Marca as parcelas.</p>';
@@ -3473,6 +3475,194 @@ function renderLabor(){
   $('#segBody').innerHTML=html; bindSCamp();
 }
 function bindSCamp(){ var s=$('#sCamp'); if(s) s.onchange=function(){ui.sCamp=s.value;ui.sLab='';saveUi();renderLabor()} }
+
+/* ---------- seguimento por labor e campaña ----------
+   Cada traballo FEITO desa labor na campaña é un pase nas súas parcelas (e tamén os rexistros antigos).
+   Unha parcela con algún pase está «en proceso» ata que ti a finalizas. O total son todas as parcelas. */
+function slugT(x){return String(x).toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g,'').replace(/[^a-z0-9]+/g,'-').replace(/^-|-$/g,'')}
+function segKey(c,tipo){return c+'_'+slugT(tipo)}
+function hReparto(parcelas,horas,pp){
+  if(pp){ var o={}; Object.keys(pp).forEach(function(k){ if(pp[k]!=null&&pp[k]!=='') o[k]=Number(pp[k]) }); return o }
+  if(horas){ var r=reparto({importe:Number(horas),parcelas:parcelas}); delete r.__xeral; return r }
+  return {};
+}
+function pasesDe(c,tipo){
+  var out=[];
+  traballos.forEach(function(t){
+    if(t.tipo!==tipo) return;
+    var rx=rexDe(t);
+    if(rx.length){ rx.forEach(function(r){ if(campDe(r.data)===c) out.push({data:r.data,parcelas:r.parcelas,h:hReparto(r.parcelas,r.horas,r.pp),job:t,quen:r.quen==='outro'?(r.persoas||'Outro'):'Propio'}) }); return; }
+    if(t.estado==='feito'&&campDe(t.dataFeita)===c) out.push({data:t.dataFeita,parcelas:t.parcelas,h:hReparto(t.parcelas,t.horas,t.hpp),job:t,quen:quenTxt(t)});
+  });
+  return out.sort(function(a,b){return (a.data||'').localeCompare(b.data||'')});
+}
+function segFeitas(c,tipo){
+  var f=Object.assign({},(segst[segKey(c,tipo)]||{}).feitas);
+  /* parcelas validadas coa versión anterior (dentro de cada traballo) */
+  traballos.forEach(function(t){ if(t.tipo!==tipo||!t.feitas) return; Object.keys(t.feitas).forEach(function(p){ var d=t.feitas[p]&&t.feitas[p].data; if(d&&campDe(d)===c&&!f[p]) f[p]={data:d} }) });
+  return f;
+}
+function segEstado(c,tipo){
+  var ps=pasesDe(c,tipo), fe=segFeitas(c,tipo), st={};
+  FEATS.forEach(function(f){ st[f.id]={e:fe[f.id]?'feita':'pendente',n:0,h:0,ult:null,fdata:fe[f.id]?fe[f.id].data:null} });
+  ps.forEach(function(p){ p.parcelas.forEach(function(id){ var x=st[id]; if(!x) return; x.n++; x.h+=(p.h[id]||0); if(!x.ult||p.data>x.ult) x.ult=p.data; if(x.e==='pendente') x.e='proceso' }) });
+  var cnt={pendente:0,proceso:0,feita:0}, ha={pendente:0,proceso:0,feita:0};
+  FEATS.forEach(function(f){ var e=st[f.id].e; cnt[e]++; ha[e]+=f.superficie_m2 });
+  return {st:st,pases:ps,cnt:cnt,ha:ha};
+}
+function segTipos(c){
+  var set={};
+  traballos.forEach(function(t){ if(campDe(iniDe(t))===c) set[t.tipo]=1; rexDe(t).forEach(function(r){ if(campDe(r.data)===c) set[t.tipo]=1 }) });
+  Object.keys(segst).forEach(function(k){ var o=segst[k]; if(o&&o.camp===c&&o.tipo&&o.feitas&&Object.keys(o.feitas).length) set[o.tipo]=1 });
+  return Object.keys(set).sort(function(a,b){ var ia=TIPOS.indexOf(a), ib=TIPOS.indexOf(b); return (ia<0?99:ia)-(ib<0?99:ib) });
+}
+function renderSeg(){
+  var actual=campDe(hoxe()); if(!ui.sCamp) ui.sCamp=actual;
+  var camps=[actual]; traballos.forEach(function(t){var c=campDe(iniDe(t)); if(c&&camps.indexOf(c)<0) camps.push(c)}); camps.sort().reverse();
+  setOptions($('#sTrab'),camps.map(function(c){return '<option value="'+c+'">'+campTxt(c)+' ('+campRango(+c)+')</option>'}).join(''),ui.sCamp);
+  if(ui.sLab&&!FEATS.length) ui.sLab='';
+  if(ui.sLab) renderSegLabor(); else renderSegResumo();
+}
+function barra(st,tot){ return '<div class="prog" role="img" aria-label="Avance"><i class="f" style="width:'+(tot?st.ha.feita/tot*100:0)+'%"></i><i class="p" style="width:'+(tot?st.ha.proceso/tot*100:0)+'%"></i></div>' }
+function renderSegResumo(){
+  var c=ui.sCamp, tipos=segTipos(c), m2=FEATS.reduce(function(a,f){return a+f.superficie_m2},0), N=FEATS.length;
+  var html='<h3 class="cats-t">Avance da campaña</h3>';
+  if(!tipos.length) html+='<div class="empty"><div><b>Aínda non hai traballos nesta campaña.</b>Cando marques un traballo como feito (ou rexistres un pase), aparece aquí o avance desa labor.</div></div>';
+  else html+='<div class="jobs">'+tipos.map(function(tp){
+    var s=segEstado(c,tp), ult=s.pases.length?s.pases[s.pases.length-1].data:null;
+    return '<article class="job"><button type="button" class="job-main" data-act="seg-lab-open" data-id="'+esc(tp)+'">'+
+      '<span class="job-top"><span class="job-tipo">'+esc(tp)+'</span>'+(s.cnt.feita===N?'<span class="chip done">Completa</span>':(s.cnt.proceso||s.cnt.feita?'<span class="chip proc">En proceso</span>':'<span class="chip plan">Sen comezar</span>'))+'</span>'+
+      '<span class="job-meta"><b>'+s.cnt.feita+' de '+N+' parcelas feitas</b>'+(s.cnt.proceso?' · '+s.cnt.proceso+' en proceso':'')+' · '+s.pases.length+(s.pases.length===1?' pase':' pases')+(ult?' · último '+fmtD(ult):'')+'</span>'+
+      barra(s,m2)+'</button></article>';
+  }).join('')+'</div>';
+  html+=laborHtml(c);
+  $('#segBody').innerHTML=html;
+}
+function renderSegLabor(){
+  var c=ui.sCamp, tp=ui.sLab, s=segEstado(c,tp), N=FEATS.length, m2=FEATS.reduce(function(a,f){return a+f.superficie_m2},0);
+  var hTot=0; Object.keys(s.st).forEach(function(k){hTot+=s.st[k].h});
+  var html='<div><button class="ghost" type="button" data-act="seg-lab-close">‹ Todas as labores</button></div>'+
+    '<div class="seg-head"><h3>'+esc(tp)+' · '+esc(campTxt(c))+'</h3>'+
+    '<div class="sumline"><b>'+s.cnt.feita+' de '+N+' parcelas feitas</b> · '+s.cnt.proceso+' en proceso · '+s.cnt.pendente+' sen facer · '+haTxt(s.ha.feita)+' de '+haTxt(m2)+(hTot?' · '+nf(hTot,1)+' h':'')+'</div>'+barra(s,m2)+
+    '<div class="actions" style="margin-top:4px"><button class="btn sm" type="button" data-act="seg-pase">+ Rexistrar pase</button>'+(s.cnt.proceso?'<button class="btn sm line" type="button" data-act="seg-fin-todas">Finalizar as '+s.cnt.proceso+' en proceso</button>':'')+'</div></div>'+
+    '<div class="mapbox"><div id="smap" role="application" aria-label="Mapa do seguimento"></div></div>'+
+    '<div class="seg-legend"><span><i style="background:'+EST_COL.pendente+'"></i>Sen facer '+s.cnt.pendente+'</span><span><i style="background:'+EST_COL.proceso+'"></i>En proceso '+s.cnt.proceso+'</span><span><i style="background:'+EST_COL.feita+'"></i>Feita '+s.cnt.feita+'</span></div>';
+  var rowsOf=function(e){ return FEATS.filter(function(f){return s.st[f.id].e===e}) };
+  var hs=FEATS.map(function(f){var x=s.st[f.id];return x.h?x.h/(f.superficie_m2/10000):null}).filter(function(v){return v!=null}), mn=Math.min.apply(null,hs), mx=Math.max.apply(null,hs);
+  var grp=function(e,tit){
+    var fs=rowsOf(e); if(!fs.length) return '';
+    return '<tr class="sub"><td colspan="5"><b>'+tit+' ('+fs.length+')</b></td></tr>'+fs.map(function(f){
+      var x=s.st[f.id], hha=x.h?x.h/(f.superficie_m2/10000):null, cls=hs.length>1&&hha!=null?(hha===mn?' class="best"':hha===mx?' class="worst"':''):'';
+      return '<tr class="click" data-act="seg-parc" data-id="'+esc(f.id)+'"><td>'+esc(f.nome)+'<br><small class="sumline">'+nf(f.superficie_m2/10000,2)+' ha'+(x.ult?' · '+fmtD(x.ult):'')+(e==='feita'&&x.fdata?' · fin '+fmtD(x.fdata):'')+'</small></td><td>'+(x.n||'—')+'</td><td>'+(x.h?nf(x.h,1):'—')+'</td><td'+cls+'>'+(hha!=null?nf(hha,1):'—')+'</td><td><span class="chip '+EST_CHIP[e]+'">'+(e==='pendente'?'Sen facer':EST_TXT[e])+'</span></td></tr>';
+    }).join('');
+  };
+  html+='<div class="tblwrap"><table class="tbl"><thead><tr><th>Parcela</th><th>Pases</th><th>Horas</th><th>h/ha</th><th>Estado</th></tr></thead><tbody>'+
+    grp('proceso','En proceso')+grp('pendente','Sen facer')+grp('feita','Feitas')+'</tbody></table></div>'+
+    '<p class="note" style="margin:0">Toca unha parcela para ver os seus pases e finalizala. Unha parcela con pases segue «en proceso» ata que a finalices ti. En verde o mellor rendemento (menos h/ha), en vermello o peor.</p>';
+  $('#segBody').innerHTML=html;
+  drawSmap(s.st);
+}
+function drawSmap(st){
+  var visible=!$('#view-trab').hidden&&!$('#segBox').hidden&&$('#smap');
+  if(!visible) return;
+  smap=null; ensureSmap();
+  FEATS.forEach(function(f){
+    var e=st[f.id]?st[f.id].e:'pendente', col=EST_COL[e];
+    var poly=L.polygon(L.GeoJSON.coordsToLatLngs(f.geometry.coordinates,2),{color:col,weight:2.5,fillColor:col,fillOpacity:e==='pendente'?.35:.6});
+    poly.bindTooltip(f.nome,{permanent:true,direction:'center',className:'plabel'});
+    poly.on('click',function(){ openSegParc(f.id) });
+    poly.addTo(slayers);
+  });
+  var fit=function(){ smap.invalidateSize(); var b=slayers.getBounds(); if(b.isValid()) smap.fitBounds(b,{padding:[20,20],maxZoom:18}) };
+  fit(); requestAnimationFrame(fit); setTimeout(fit,250);
+  smap.on('zoomend',function(){ $('#smap').classList.toggle('nolabels',smap.getZoom()<15) });
+}
+function openSegParc(pid){
+  var c=ui.sCamp, tp=ui.sLab, f=BYID[pid]; if(!f||!tp) return;
+  var s=segEstado(c,tp), x=s.st[pid], ps=s.pases.filter(function(p){return p.parcelas.indexOf(pid)>-1});
+  openSheet('<div class="sh-head"><div style="flex:1;min-width:0"><h2>'+esc(f.nome)+'</h2><div class="meta"><span class="chip '+EST_CHIP[x.e]+'">'+(x.e==='pendente'?'Sen facer':EST_TXT[x.e])+'</span><span class="chip" style="background:var(--surface);color:var(--muted)">'+esc(tp)+' · '+esc(campTxt(c))+'</span></div></div><button class="ghost" type="button" data-act="close">Pechar</button></div>'+
+    '<dl class="facts"><dt>Superficie</dt><dd>'+supTxt(f)+'</dd><dt>Pases</dt><dd>'+x.n+'</dd><dt>Horas</dt><dd>'+(x.h?nf(x.h,1)+' h · '+nf(x.h/(f.superficie_m2/10000),1)+' h/ha':'—')+'</dd>'+(x.fdata?'<dt>Finalizada</dt><dd>'+fmtD(x.fdata)+'</dd>':'')+'</dl>'+
+    (ps.length?'<ul class="mini-list">'+ps.map(function(p){var h=p.h[pid];return '<li><span>'+(h?nf(h,1)+' h':'Sen horas')+' · '+esc(p.quen)+'</span><time>'+fmtD(p.data)+'</time><button class="btn sm line" type="button" data-act="edit" data-id="'+esc(p.job.id)+'">Ver</button></li>'}).join('')+'</ul>':'<p class="note">Aínda sen pases nesta campaña.</p>')+
+    '<div class="actions"><button class="btn line" type="button" data-act="seg-pase" data-id="'+esc(pid)+'">+ Rexistrar pase aquí</button>'+
+    (x.e==='feita'?'<button class="btn danger" type="button" data-act="seg-fin" data-id="'+esc(pid)+'" data-v="0">Desfacer finalizada</button>':'<button class="btn" type="button" data-act="seg-fin" data-id="'+esc(pid)+'" data-v="1">Finalizar: está feita</button>')+'</div>');
+}
+function setFin(pids,on){
+  var c=ui.sCamp, tp=ui.sLab, k=segKey(c,tp);
+  var o=Object.assign({camp:c,tipo:tp,feitas:{}},segst[k]); o.feitas=Object.assign({},o.feitas);
+  pids.forEach(function(p){ if(on) o.feitas[p]={data:hoxe()}; else delete o.feitas[p] });
+  segst=Object.assign({},segst); segst[k]=o; save('vd.seg.v1',segst);
+  if(!on){ /* quitar tamén as validacións da versión anterior */
+    var ch=false; traballos.forEach(function(t){ if(t.tipo===tp&&t.feitas){ pids.forEach(function(p){ if(t.feitas[p]&&campDe(t.feitas[p].data)===c){ t.feitas=Object.assign({},t.feitas); delete t.feitas[p]; ch=true } }) } });
+    if(ch) save(LS.tr,traballos);
+  }
+  closeSheet(); refreshAll(); toast(on?(pids.length>1?pids.length+' parcelas finalizadas':'Parcela finalizada'):'Parcela volve a «en proceso»');
+}
+function openPase(pid){
+  var tp=ui.sLab; if(!tp) return;
+  openSheet('<form id="pf2" novalidate data-modo="total">'+
+    '<div class="sh-head"><h2>Rexistrar pase</h2><button class="ghost" type="button" data-act="close">Pechar</button></div>'+
+    '<p class="note">'+esc(tp)+' · '+esc(campTxt(ui.sCamp))+'. Gárdase como un traballo feito.</p>'+
+    '<div class="field"><label for="r-data">Data</label><input type="date" id="r-data" value="'+hoxe()+'"></div>'+
+    '<fieldset class="field"><legend>Parcelas traballadas</legend>'+
+    '<div class="quick"><button type="button" data-act="quick-p" data-q="todas">Todas</button><button type="button" data-act="quick-p" data-q="propiedade">Propiedade</button><button type="button" data-act="quick-p" data-q="alugada">Alugada</button><button type="button" data-act="quick-p" data-q="ningunha">Ningunha</button></div>'+
+    '<div class="pchips">'+FEATS.map(function(f){return '<label class="chk"><input type="checkbox" name="parcela" value="'+esc(f.id)+'"'+(pid===f.id?' checked':'')+'><span><i class="dot '+f.tenencia+'"></i>'+esc(f.nome)+'</span></label>'}).join('')+'</div></fieldset>'+
+    '<div class="field"><span class="l">Horas</span><div class="seg" role="group" aria-label="Como dar as horas"><button type="button" data-act="rex-modo" data-m="total" aria-pressed="true">Total (repártese)</button><button type="button" data-act="rex-modo" data-m="pp" aria-pressed="false">Por parcela</button></div></div>'+
+    '<div id="r-total" class="field"><input type="number" id="r-horas" inputmode="decimal" min="0" step="0.25" placeholder="Horas en total (opcional)"><p class="note" style="margin:4px 0 0">Repártense entre as parcelas marcadas segundo a superficie.</p></div>'+
+    '<div id="r-pp" hidden></div>'+
+    quenField('r','propio','')+
+    '<label class="chk" style="display:inline-block;margin:6px 0 12px"><input type="checkbox" id="r-feita"><span>Finalizar estas parcelas</span></label>'+
+    '<p class="err" id="r-err" role="alert"></p>'+
+    '<div class="actions"><button class="btn" type="submit">Gardar pase</button></div></form>');
+  rexPP();
+}
+function savePase(form){
+  var err=function(m){$('#r-err',form).textContent=m;return false};
+  var data=$('#r-data',form).value, ps=$$('input[name=parcela]:checked',form).map(function(i){return i.value});
+  if(!data) return err('Pon a data.');
+  if(!ps.length) return err('Marca polo menos unha parcela.');
+  var q=quenVal('r',form), t={id:newId(),tipo:ui.sLab,estado:'feito',parcelas:ps,dataPrev:data,dataPrevFin:null,dataFeita:data,dataFeitaFin:null,horas:null,quen:q.quen,persoas:q.persoas,custoPrev:null,custoReal:null,produto:'',dose:'',notas:''};
+  if(form.getAttribute('data-modo')==='pp'){
+    var pp={}, any=false, sum=0; $$('input[data-pp]',form).forEach(function(i){ var v=numOf(i); if(v!=null){ pp[i.getAttribute('data-pp')]=v; sum+=v; any=true } });
+    if(any){ t.hpp=pp; t.horas=Math.round(sum*100)/100 }
+  } else { var h=numOf($('#r-horas',form)); if(h!=null) t.horas=h }
+  traballos.push(t);
+  if(!save(LS.tr,traballos)) return false;
+  if(campDe(data)!==ui.sCamp){ ui.sCamp=campDe(data); saveUi() }
+  if($('#r-feita',form).checked){ setFin(ps,true); toast('Pase gardado e parcelas finalizadas'); return true }
+  closeSheet(); refreshAll(); toast('Pase gardado'); return true;
+}
+/* táboa de rendemento por labor (a partir dos pases) */
+function laborHtml(c){
+  var tipos=segTipos(c), by={};
+  tipos.forEach(function(tp){
+    var b={n:0,m2:0,h:0,e:0,m2e:0,par:{}};
+    pasesDe(c,tp).forEach(function(p){
+      b.n++;
+      p.parcelas.forEach(function(id){ if(!BYID[id]) return; var x=b.par[id]||(b.par[id]={h:0,m2:0,e:0,m2e:0}); x.m2+=BYID[id].superficie_m2; x.h+=(p.h[id]||0); b.m2+=BYID[id].superficie_m2; b.h+=(p.h[id]||0) });
+    });
+    traballos.forEach(function(t){
+      if(t.tipo!==tp||t.estado!=='feito'||campDe(t.dataFeita)!==c) return;
+      var tot=custoTrab(t).total; if(!tot) return;
+      b.e+=tot; var cp=custoParcelas(t);
+      t.parcelas.forEach(function(id){ if(!BYID[id]) return; b.m2e+=BYID[id].superficie_m2; var x=b.par[id]||(b.par[id]={h:0,m2:0,e:0,m2e:0}); x.e+=(cp[id]||0); x.m2e+=BYID[id].superficie_m2 });
+    });
+    if(b.n||b.e) by[tp]=b;
+  });
+  var ks=Object.keys(by);
+  if(!ks.length) return '';
+  return '<h3 class="cats-t" style="margin-top:8px">Rendemento por labor</h3><div class="tblwrap"><table class="tbl"><thead><tr><th>Labor</th><th>Pases</th><th>ha</th><th>Horas</th><th>h/ha</th><th>€/ha</th></tr></thead><tbody>'+
+    ks.map(function(k){
+      var b=by[k], on=ui.sRend===k;
+      var r='<tr class="click'+(on?' on':'')+'" data-act="seg-rend" data-id="'+esc(k)+'"><td>'+esc(k)+'</td><td>'+b.n+'</td><td>'+nf(b.m2/10000,2)+'</td><td>'+(b.h?nf(b.h,1):'—')+'</td><td>'+(b.h&&b.m2?nf(b.h/(b.m2/10000),1):'—')+'</td><td>'+(b.e&&b.m2e?nf(b.e/(b.m2e/10000),0):'—')+'</td></tr>';
+      if(on){
+        var ps=Object.keys(b.par).map(function(p){var x=b.par[p];return {p:p,hha:x.h&&x.m2?x.h/(x.m2/10000):null,eha:x.e&&x.m2e?x.e/(x.m2e/10000):null,h:x.h}}).sort(function(a,z){return (a.hha==null)-(z.hha==null)||(a.hha||0)-(z.hha||0)});
+        var hs=ps.filter(function(x){return x.hha!=null}).map(function(x){return x.hha}), mn=Math.min.apply(null,hs), mx=Math.max.apply(null,hs);
+        r+=ps.map(function(x){var cls=hs.length>1&&x.hha!=null?(x.hha===mn?' class="best"':x.hha===mx?' class="worst"':''):'';return '<tr class="sub"><td>↳ '+esc(BYID[x.p].nome)+'</td><td></td><td>'+nf(BYID[x.p].superficie_m2/10000,2)+'</td><td>'+(x.h?nf(x.h,1):'—')+'</td><td'+cls+'>'+(x.hha!=null?nf(x.hha,1):'—')+'</td><td>'+(x.eha!=null?nf(x.eha,0):'—')+'</td></tr>'}).join('');
+      }
+      return r;
+    }).join('')+'</tbody></table></div>'+
+    '<p class="note" style="margin:0">Sobre a superficie traballada en cada pase (se unha parcela leva dous pases, conta dúas veces). Toca unha labor para velo parcela a parcela.</p>';
+}
 
 /* ---------- gastos e inversións ---------- */
 function entradas(){
@@ -3852,9 +4042,9 @@ var FBCFG_BAKED={"apiKey": "AIzaSyB0MBoP8EdU1N5hf8s8cBKtwi9NvhvzURU", "authDomai
 var SY=load('vd.sync.v1',{});
 function saveSY(){try{localStorage.setItem('vd.sync.v1',JSON.stringify(SY))}catch(e){}}
 var sync={on:false,user:null,ready:{},known:{},pend:{},unsub:[],status:'off',err:'',offline:false};
-var COLS={traballos:{k:LS.tr,arr:true},gastos:{k:LS.ga,arr:true},notas:{k:LS.no,arr:true},custom:{k:LS.cu,arr:true},parcelas:{k:LS.pc,arr:false}};
-function getCol(c){return c==='traballos'?traballos:c==='gastos'?gastos:c==='notas'?notas:c==='custom'?custom:ov}
-function setCol(c,v){if(c==='traballos')traballos=v;else if(c==='gastos')gastos=v;else if(c==='notas')notas=v;else if(c==='custom')custom=v;else ov=v}
+var COLS={traballos:{k:LS.tr,arr:true},gastos:{k:LS.ga,arr:true},notas:{k:LS.no,arr:true},custom:{k:LS.cu,arr:true},parcelas:{k:LS.pc,arr:false},seguimento:{k:'vd.seg.v1',arr:false}};
+function getCol(c){return c==='traballos'?traballos:c==='gastos'?gastos:c==='notas'?notas:c==='custom'?custom:c==='seguimento'?segst:ov}
+function setCol(c,v){if(c==='traballos')traballos=v;else if(c==='gastos')gastos=v;else if(c==='notas')notas=v;else if(c==='custom')custom=v;else if(c==='seguimento')segst=v;else ov=v}
 function colOfKey(k){for(var c in COLS) if(COLS[c].k===k) return c; return null}
 function toMap(c,v){
   var m={};
@@ -4043,7 +4233,7 @@ function openDatos(){
   '<p class="err" id="d-msg" role="status" style="color:var(--muted);margin-top:12px"></p>');
 }
 function exportar(){
-  var data={app:'vinas-david',versao:3,exportado:new Date().toISOString(),traballos:traballos,gastos:gastos,notas:notas,custom:custom,parcelas:ov};
+  var data={app:'vinas-david',versao:4,exportado:new Date().toISOString(),traballos:traballos,gastos:gastos,notas:notas,custom:custom,parcelas:ov,seguimento:segst};
   var blob=new Blob([JSON.stringify(data,null,2)],{type:'application/json'});
   var a=document.createElement('a'); a.href=URL.createObjectURL(blob); a.download='xestion-vinedo-copia-'+hoxe()+'.json';
   document.body.appendChild(a); a.click(); a.remove(); setTimeout(function(){URL.revokeObjectURL(a.href)},1500);
@@ -4137,9 +4327,10 @@ function datosExcel(){
   var acc=function(k){return bp[k]||(bp[k]={g:0,i:0,h:0})};
   ents.forEach(function(e){ if(e.previsto) return; var r=reparto(e); Object.keys(r).forEach(function(k){ var a=acc(k); if(e.natureza==='inversion') a.i+=r[k]; else a.g+=r[k]; }) });
   ts.forEach(function(t){ var r=horasPorParcela(t); Object.keys(r).forEach(function(k){ acc(k).h+=r[k] }) });
-  var sRows=[];
-  ts.forEach(function(t){ var hp=horasPorParcela(t); (t.parcelas||[]).filter(function(p){return BYID[p]}).forEach(function(p){ var a=BYID[p].superficie_m2/10000, h=hp[p]||0, fe=(t.feitas||{})[p];
-    sRows.push([t.tipo,iniDe(t)||'',BYID[p].nome,EST_TXT[estadoParc(t,p)],fe&&fe.data?fe.data:'',Math.round(a*10000)/10000,h?round2(h):'',h&&a?round2(h/a):'']) }) });
+  var sRows=[], sc=camp==='todas'?null:camp, scs=sc?[sc]:[];
+  if(!sc){ traballos.forEach(function(t){ var cc=campDe(iniDe(t)); if(cc&&scs.indexOf(cc)<0) scs.push(cc) }); scs.sort() }
+  scs.forEach(function(cc){ segTipos(cc).forEach(function(tp){ var se=segEstado(cc,tp); FEATS.forEach(function(f){ var x=se.st[f.id], a=f.superficie_m2/10000;
+    sRows.push([tp,+cc,f.nome,x.e==='pendente'?'Sen facer':EST_TXT[x.e],x.n,x.ult||'',x.fdata||'',Math.round(a*10000)/10000,x.h?round2(x.h):'',x.h&&a?round2(x.h/a):'']) }) }) });
   var pRows=FEATS.map(function(f){
     var a=bp[f.id]||{g:0,i:0,h:0}, ha=f.superficie_m2/10000;
     return [f.nome,f.id,TEN[f.tenencia],Math.round(ha*10000)/10000,round2(a.g),round2(a.i),round2(a.g+a.i),ha?round2((a.g+a.i)/ha):'',round2(a.h),ha?round2(a.h/ha):''];
@@ -4148,7 +4339,7 @@ function datosExcel(){
   return {camp:camp,sheets:[
     {name:'Gastos',totals:{cols:[5],cond:[6,'Real'],label:'TOTAL reais'},cols:[{h:'Data',t:'d',w:12},{h:'Campaña',t:'n',w:10},{h:'Concepto',w:34},{h:'Categoría',w:24},{h:'Tipo',w:11},{h:'Importe (€)',t:'e',w:14},{h:'Estado',w:10},{h:'Orixe',w:22},{h:'Traballo',w:22},{h:'Parcelas',w:34},{h:'Cantidade',t:'h',w:11},{h:'Unidade',w:10},{h:'Provedor',w:20}],rows:gRows},
     {name:'Traballos',totals:{cols:[5,10,11,12],cond:[1,'Feito'],label:'TOTAL feitos'},cols:[{h:'Traballo',w:24},{h:'Estado',w:12},{h:'Inicio',t:'d',w:12},{h:'Fin',t:'d',w:12},{h:'Días',t:'n',w:7},{h:'Horas',t:'h',w:9},{h:'Horas/ha',t:'h',w:10},{h:'Quen o fixo',w:18},{h:'Parcelas',w:34},{h:'Superficie (ha)',t:'h',w:14},{h:'Man de obra (€)',t:'e',w:15},{h:'Materiais (€)',t:'e',w:14},{h:'Total (€)',t:'e',w:13},{h:'Produto',w:18},{h:'Dose',w:12},{h:'Notas',w:40}],rows:tRows},
-    {name:'Seguimento',totals:{cols:[6]},cols:[{h:'Traballo',w:24},{h:'Inicio',t:'d',w:12},{h:'Parcela',w:24},{h:'Estado',w:12},{h:'Validada',t:'d',w:12},{h:'Superficie (ha)',t:'h',w:14},{h:'Horas',t:'h',w:9},{h:'Horas/ha',t:'h',w:10}],rows:sRows},
+    {name:'Seguimento',totals:{cols:[4,8]},cols:[{h:'Labor',w:24},{h:'Campaña',t:'n',w:10},{h:'Parcela',w:24},{h:'Estado',w:12},{h:'Pases',t:'n',w:8},{h:'Último pase',t:'d',w:12},{h:'Finalizada',t:'d',w:12},{h:'Superficie (ha)',t:'h',w:14},{h:'Horas',t:'h',w:9},{h:'Horas/ha',t:'h',w:10}],rows:sRows},
     {name:'Por parcela',totals:{cols:[3,4,5,6,8]},cols:[{h:'Parcela',w:24},{h:'Código',w:12},{h:'Tenza',w:12},{h:'Superficie (ha)',t:'h',w:14},{h:'Gastos (€)',t:'e',w:13},{h:'Inversións (€)',t:'e',w:14},{h:'Total (€)',t:'e',w:13},{h:'€/ha',t:'e',w:12},{h:'Horas',t:'h',w:9},{h:'Horas/ha',t:'h',w:10}],rows:pRows}
   ]};
 }
@@ -4191,7 +4382,8 @@ function confirmImport(){
   custom=Array.isArray(d.custom)?d.custom.filter(function(c){return c&&c.id&&c.geometry}):[];
   ov=d.parcelas&&typeof d.parcelas==='object'?d.parcelas:{};
   notas=Array.isArray(d.notas)?d.notas.filter(function(n){return n&&n.id}):[];
-  save(LS.tr,traballos); save(LS.ga,gastos); save(LS.cu,custom); save(LS.pc,ov); save(LS.no,notas);
+  segst=d.seguimento&&typeof d.seguimento==='object'?d.seguimento:{};
+  save(LS.tr,traballos); save(LS.ga,gastos); save(LS.cu,custom); save(LS.pc,ov); save(LS.no,notas); save('vd.seg.v1',segst);
   closeSheet(); rebuildAll(); toast('Copia importada');
 }
 
@@ -4202,6 +4394,7 @@ function setTab(t){
   $('#view-expl').hidden=t!=='expl'; $('#view-trab').hidden=t!=='trab'; $('#view-gast').hidden=t!=='gast';
   updFab();
   $$('.tabs [data-act="tab"]').forEach(function(b){ if(b.getAttribute('data-tab')===t) b.setAttribute('aria-current','page'); else b.removeAttribute('aria-current'); });
+  if(t==='trab'&&ui.vista==='seg') requestAnimationFrame(renderSeg);
   if(t==='expl'&&ui.esub==='parcelas'){ requestAnimationFrame(function(){map.invalidateSize(); if(!fitted){fitAll();fitted=true} updLabels()}); }
   window.scrollTo(0,0);
 }
@@ -4350,8 +4543,17 @@ document.addEventListener('click',function(e){
     case 'seg-delrex':
       armDelete(el,'Confirmar',function(){ var t=jobById(ui.sTrab); if(!t) return; t.rexistros=rexDe(t).filter(function(r){return r.id!==id}); save(LS.tr,traballos); refreshAll(); toast('Rexistro borrado') }); break;
     case 'seg-lab': ui.sLab=ui.sLab===id?'':id; saveUi(); renderLabor(); break;
+    case 'seg-lab-open': ui.sLab=id; saveUi(); renderSeg(); window.scrollTo(0,0); break;
+    case 'seg-lab-close': ui.sLab=''; saveUi(); renderSeg(); break;
+    case 'seg-rend': ui.sRend=ui.sRend===id?'':id; saveUi(); renderSeg(); break;
+    case 'seg-parc': openSegParc(id); break;
+    case 'seg-pase': closeSheet(); openPase(id); break;
+    case 'seg-fin': setFin([id],el.getAttribute('data-v')==='1'); break;
+    case 'seg-fin-todas':
+      armDelete(el,'Confirmar: finalizar todas',function(){ var s=segEstado(ui.sCamp,ui.sLab); setFin(FEATS.filter(function(f){return s.st[f.id].e==='proceso'}).map(function(f){return f.id}),true) }); break;
+    case 'quick-p': setChecks($('#pf2'),el.getAttribute('data-q')); rexPP(); break;
     case 'rex-modo':
-      var rf=$('#rf'), mm=el.getAttribute('data-m'); rf.setAttribute('data-modo',mm);
+      var rf=$('#rf')||$('#pf2'), mm=el.getAttribute('data-m'); rf.setAttribute('data-modo',mm);
       $$('[data-act="rex-modo"]',rf).forEach(function(b){b.setAttribute('aria-pressed',String(b===el))});
       $('#r-total',rf).hidden=mm!=='total'; $('#r-pp',rf).hidden=mm!=='pp'; rexPP(); break;
     case 'gcomp': ui.gCamp=id; saveUi(); renderGastos(); window.scrollTo(0,0); break;
@@ -4370,6 +4572,7 @@ document.addEventListener('submit',function(e){
   else if(id==='if') saveImport(e.target);
   else if(id==='lf') doLogin(e.target);
   else if(id==='rf') saveRex(e.target);
+  else if(id==='pf2') savePase(e.target);
   else if(id==='cf'){
     var c=parseCfg($('#c-txt',e.target).value);
     if(!c){ $('#c-err',e.target).textContent='Non atopo apiKey, projectId e appId nese texto.'; }
@@ -4389,8 +4592,8 @@ document.addEventListener('change',function(e){
 $('#gAno').addEventListener('change',function(e){ui.gCamp=e.target.value;saveUi();renderGastos()});
 $('#gCat').addEventListener('change',function(e){ui.gCat=e.target.value;saveUi();renderGastos()});
 $('#gPar').addEventListener('change',function(e){ui.gPar=e.target.value;saveUi();renderGastos()});
-$('#sTrab').addEventListener('change',function(e){ui.sTrab=e.target.value;saveUi();renderSeg()});
-document.addEventListener('change',function(e){ if(e.target.name==='parcela'&&e.target.closest('#rf')) rexPP() });
+$('#sTrab').addEventListener('change',function(e){ui.sCamp=e.target.value;ui.sLab='';saveUi();renderSeg()});
+document.addEventListener('change',function(e){ if(e.target.name==='parcela'&&(e.target.closest('#rf')||e.target.closest('#pf2'))) rexPP() });
 $('#nParcela').addEventListener('change',function(e){ui.nPar=e.target.value;saveUi();renderNotas()});
 $('#nBusca').addEventListener('input',renderNotas);
 document.addEventListener('change',function(e){
@@ -4410,7 +4613,7 @@ window.addEventListener('online',function(){sync.offline=false;updSyncUi()});
 window.addEventListener('offline',function(){sync.offline=true;updSyncUi()});
 sync.offline=navigator.onLine===false;
 initSync();
-if(window.__VD_TEST) window.__vd={map:map,bases:bases,pt:function(lat,lng){map.fire('click',{latlng:L.latLng(lat,lng)})},custom:function(){return custom},smap:function(){return smap},excel:function(){return datosExcel()},xlsx:function(){var d=datosExcel();return xlsxBlob(d.sheets)},sync:sync,data:function(){return {traballos:traballos,gastos:gastos,notas:notas,custom:custom,ov:ov}},editing:function(){return editing},notas:function(){return notas},utmInv:utmInv};
+if(window.__VD_TEST) window.__vd={map:map,bases:bases,pt:function(lat,lng){map.fire('click',{latlng:L.latLng(lat,lng)})},custom:function(){return custom},segst:function(){return segst},smap:function(){return smap},excel:function(){return datosExcel()},xlsx:function(){var d=datosExcel();return xlsxBlob(d.sheets)},sync:sync,data:function(){return {traballos:traballos,gastos:gastos,notas:notas,custom:custom,ov:ov}},editing:function(){return editing},notas:function(){return notas},utmInv:utmInv};
 
 if('serviceWorker' in navigator && /^https?:$/.test(location.protocol)){
   window.addEventListener('load',function(){navigator.serviceWorker.register('sw.js').catch(function(){})});
